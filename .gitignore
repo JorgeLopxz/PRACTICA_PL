@@ -1,0 +1,31 @@
+# --- Visual Studio Code ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# --- Archivos del Sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Dependencias (Personaliza según tu lenguaje) ---
+node_modules/
+dist/
+build/
+bin/
+obj/
+out/
+
+# --- Variables de Entorno y Secretos ---
+.env
+.env.local
+.env.*.local
+*.log
+
+# --- Otros Editores ---
+.idea/
+.history/
+*.sublime-project
+*.sublime-workspace
