@@ -1,12 +1,19 @@
+//Raoul Vlad Ivaszuk Ivaszuk, Jorge Lopez Alonso
+//100508621@alumnos.uc3m.es 100495876@alumnos.uc3m.es
+
 %{                              /* Seccion 1  Declaraciones de C y BISON */
 #include <stdio.h>
 #define YYSTYPE  double
+int yyerror();
+int yylex();
 %}
                                 /* Seccion 2  Declaraciones de BISON   */  
 %%
                                 /* Seccion 3  Sint - Semantico   */
 
-axioma:      expresion '\n'          { printf ("Expresion=%lf\n", $1); }
+axioma:      expresion '\n'          { printf ("Expresion=%lf\n", $1); } axioma
+            | '\n' expresion         { printf ("Expresion=%lf\n", $2); }
+            | /* vacio */            { ; }
            ;
 
 expresion:   operando                { $$ = $1; }
