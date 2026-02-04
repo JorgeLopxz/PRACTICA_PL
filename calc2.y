@@ -1,6 +1,6 @@
 /*
-     NAME1, NAME2, TEAMNUMBER
-     email1, email2
+     Raoul Vlad Ivaszuk Ivaszuk, Jorge Lopez Alonso 509
+     100508621@alumnos.uc3m.es, 100495876@alumnos.uc3m.es
 */
 %{					/* Seccion 1  Declaraciones de C-Bison */
 #include <stdio.h>
