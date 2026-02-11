@@ -1,3 +1,7 @@
+/*
+     Raoul Vlad Ivaszuk Ivaszuk, Jorge Lopez Alonso 509
+     100508621@alumnos.uc3m.es, 100495876@alumnos.uc3m.es
+*/
 %{                            /* Primera Seccion */
 #include "calc4.tab.h"        /* Cabecera con decl. de token etc. */
 extern int n_linea;
