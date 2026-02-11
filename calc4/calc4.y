@@ -1,3 +1,7 @@
+/*
+     Raoul Vlad Ivaszuk Ivaszuk, Jorge Lopez Alonso 509
+     100508621@alumnos.uc3m.es, 100495876@alumnos.uc3m.es
+*/
 %{                                /* Seccion 1 Declaraciones de C-bison */
 #include <stdio.h>
 #define YYSTYPE double            /* tipo de la pila del parser           */
