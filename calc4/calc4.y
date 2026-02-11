@@ -5,8 +5,10 @@ int yyerror () ;
 int yylex () ;
 %}
 %token NUMERO                     /* Seccion 2 Declaraciones de bison      */
+%token VARIABLE
 %left '+' '-'     /* menor orden de precedencia */
 %left '*' '/'     /* orden de precedencia intermedio */
+%right '='
 %left SIGNO_UNARIO /* define la mayor precedencia, ademas de nuevo token */
 %%
                                   /* Seccion 3 Gramatica - Semantico      */
@@ -17,18 +19,18 @@ r_expr:                    /* lambda */
             | axioma
             ;
 
-expresion:    operando                { $$  = $1; }
-            | operando '+' expresion  { $$  = $1 + $3; }
-            | operando '-' expresion  { $$  = $1 - $3; }
-            | operando '*' expresion  { $$  = $1 * $3; }
-            | operando '/' expresion  { $$  = $1 / $3; }
-            ;
+expresion:   NUMERO                 { $$ = $1; }
+           | VARIABLE                { $$ = 0;  }
+           | VARIABLE '=' expresion  { $$ = $3; }
+           | expresion '+' expresion { $$ = $1 + $3; }
+           | expresion '-' expresion { $$ = $1 - $3; }
+           | expresion '*' expresion { $$ = $1 * $3; }
+           | expresion '/' expresion { $$ = $1 / $3; }
+           | '(' expresion ')'       { $$ = $2; }
+           | '-' expresion %prec SIGNO_UNARIO { $$ = -$2; }
+           | '+' expresion %prec SIGNO_UNARIO { $$ = $2; }
+           ;
 
-operando:     NUMERO                                    { $$ = $1; }
-            | '+' NUMERO %prec SIGNO_UNARIO             { $$ = $2; }
-            | '-' NUMERO %prec SIGNO_UNARIO             { $$ = -$2; }
-            | '(' expresion ')'                         { $$ = $2; }
-            ;
 %%
                                          /* Seccion 4  Codigo en C    */
 int n_linea= 1 ;
@@ -40,25 +42,6 @@ int yyerror (char *mensaje)
 
 /* suprimir la funcion yylex () si se usa flex */
 ///*
-int yylex ()
-{
-    unsigned char c ;
-
-    do {
-         c = getchar () ;
-    } while (c==' ') ;
-
-    if (c == '.' || (c >= '0' && c <= '9')) {
-         ungetc (c, stdin) ;
-         scanf ("%lf", &yylval) ;
-         return NUMERO ;
-    }
-
-    if (c == '\n')
-           n_linea++ ;
-
-    return c ;
-}
 //*/
 
 int main ()
