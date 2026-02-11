@@ -22,12 +22,14 @@ expresion:   operando                { $$ = $1; }
            | operando '/' expresion  { $$ = $1 / $3; }
            ;
 
-operando:    NUMERO                  { $$ = $1; }
-           | '('  expresion  ')'     { $$ = $2; }
-           | '-' NUMERO              { $$ = -$2; }
-           | '+' NUMERO              { $$ = $2; }
+operando:    resto_operando          { $$ = $1; }
+           | '-' resto_operando      { $$ = -$2; }
+           | '+' resto_operando      { $$ = $2; }
            ;
-
+resto_operando:  
+              NUMERO                  { $$ = $1; }
+            | '('  expresion  ')'     { $$ = $2; }
+           ;
 %%
 					/* Seccion 4  Codigo en C   */
 
