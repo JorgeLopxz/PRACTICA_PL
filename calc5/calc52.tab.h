@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_CALC5_TAB_H_INCLUDED
-# define YY_YY_CALC5_TAB_H_INCLUDED
+#ifndef YY_YY_CALC52_TAB_H_INCLUDED
+# define YY_YY_CALC52_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -65,12 +65,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 8 "calc5.y"
+#line 12 "calc52.y"
                 /* El tipo de la pila (del AP) tiene caracter dual */
       double valor ;    /*  - valor numerico real */
       int indice ;      /*  - indice para identificar una variable */
 
-#line 74 "calc5.tab.h"
+#line 74 "calc52.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -85,4 +85,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_CALC5_TAB_H_INCLUDED  */
+#endif /* !YY_YY_CALC52_TAB_H_INCLUDED  */
