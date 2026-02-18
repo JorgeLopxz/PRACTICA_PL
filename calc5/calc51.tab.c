@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "calc5.y"
+#line 5 "calc51.y"
                       /* SECCION 1 */
 #include <stdio.h>
 double memoria [52] ;   /* Se define una zona de memoria para las variables */
@@ -75,7 +75,7 @@ double memoria [52] ;   /* Se define una zona de memoria para las variables */
 int yyerror () ;
 int yylex () ;
 
-#line 79 "calc5.tab.c"
+#line 79 "calc51.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -98,7 +98,56 @@ int yylex () ;
 #  endif
 # endif
 
-#include "calc5.tab.h"
+
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token kinds.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    NUMERO = 258,                  /* NUMERO  */
+    VARIABLE = 259,                /* VARIABLE  */
+    SIGNO_UNARIO = 260             /* SIGNO_UNARIO  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
+#endif
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+union YYSTYPE
+{
+#line 12 "calc51.y"
+                /* El tipo de la pila (del AP) tiene caracter dual */
+      double valor ;    /*  - valor numerico real */
+      int indice ;      /*  - indice para identificar una variable */
+
+#line 136 "calc51.tab.c"
+
+};
+typedef union YYSTYPE YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
+#endif
+
+
+extern YYSTYPE yylval;
+
+
+int yyparse (void);
+
+
+
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -511,8 +560,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    24,    24,    24,    26,    26,    37,    38,    41,    42,
-      43,    44,    45,    48,    49,    50,    53,    54,    55
+       0,    28,    28,    28,    30,    30,    41,    42,    45,    46,
+      47,    48,    49,    52,    53,    54,    57,    58,    59
 };
 #endif
 
@@ -1090,13 +1139,13 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* $@1: %empty  */
-#line 24 "calc5.y"
+#line 28 "calc51.y"
                                           { printf ("Expresion=%lf\n", (yyvsp[-1].valor)) ; }
-#line 1096 "calc5.tab.c"
+#line 1145 "calc51.tab.c"
     break;
 
   case 4: /* $@2: %empty  */
-#line 26 "calc5.y"
+#line 30 "calc51.y"
                                           { memoria [(yyvsp[-3].indice)] = (yyvsp[-1].valor);
                                              if ((yyvsp[-3].indice) < 26){
                                                   printf ("%c=%lf\n", (yyvsp[-3].indice)+'A', (yyvsp[-1].valor));
@@ -1105,77 +1154,77 @@ yyreduce:
                                                   printf ("%c=%lf\n", (yyvsp[-3].indice)-26+'a', (yyvsp[-1].valor));
                                              }
                                           }
-#line 1109 "calc5.tab.c"
+#line 1158 "calc51.tab.c"
     break;
 
   case 8: /* expresion: termino  */
-#line 41 "calc5.y"
+#line 45 "calc51.y"
                                          { (yyval.valor) = (yyvsp[0].valor); }
-#line 1115 "calc5.tab.c"
+#line 1164 "calc51.tab.c"
     break;
 
   case 9: /* expresion: expresion '+' expresion  */
-#line 42 "calc5.y"
+#line 46 "calc51.y"
                                          { (yyval.valor) = (yyvsp[-2].valor) + (yyvsp[0].valor);  }
-#line 1121 "calc5.tab.c"
+#line 1170 "calc51.tab.c"
     break;
 
   case 10: /* expresion: expresion '-' expresion  */
-#line 43 "calc5.y"
+#line 47 "calc51.y"
                                          { (yyval.valor) = (yyvsp[-2].valor) - (yyvsp[0].valor);  }
-#line 1127 "calc5.tab.c"
+#line 1176 "calc51.tab.c"
     break;
 
   case 11: /* expresion: expresion '*' expresion  */
-#line 44 "calc5.y"
+#line 48 "calc51.y"
                                          { (yyval.valor) = (yyvsp[-2].valor) * (yyvsp[0].valor);  }
-#line 1133 "calc5.tab.c"
+#line 1182 "calc51.tab.c"
     break;
 
   case 12: /* expresion: expresion '/' expresion  */
-#line 45 "calc5.y"
+#line 49 "calc51.y"
                                          { (yyval.valor) = (yyvsp[-2].valor) / (yyvsp[0].valor);  }
-#line 1139 "calc5.tab.c"
+#line 1188 "calc51.tab.c"
     break;
 
   case 13: /* termino: operando  */
-#line 48 "calc5.y"
+#line 52 "calc51.y"
                                                  { (yyval.valor) = (yyvsp[0].valor); }
-#line 1145 "calc5.tab.c"
+#line 1194 "calc51.tab.c"
     break;
 
   case 14: /* termino: '+' operando  */
-#line 49 "calc5.y"
+#line 53 "calc51.y"
                                                  { (yyval.valor) = (yyvsp[0].valor); }
-#line 1151 "calc5.tab.c"
+#line 1200 "calc51.tab.c"
     break;
 
   case 15: /* termino: '-' operando  */
-#line 50 "calc5.y"
+#line 54 "calc51.y"
                                                  { (yyval.valor) = -(yyvsp[0].valor); }
-#line 1157 "calc5.tab.c"
+#line 1206 "calc51.tab.c"
     break;
 
   case 16: /* operando: VARIABLE  */
-#line 53 "calc5.y"
+#line 57 "calc51.y"
                                          { (yyval.valor) = memoria [(yyvsp[0].indice)]; }
-#line 1163 "calc5.tab.c"
+#line 1212 "calc51.tab.c"
     break;
 
   case 17: /* operando: NUMERO  */
-#line 54 "calc5.y"
+#line 58 "calc51.y"
                                          { (yyval.valor) = (yyvsp[0].valor); }
-#line 1169 "calc5.tab.c"
+#line 1218 "calc51.tab.c"
     break;
 
   case 18: /* operando: '(' expresion ')'  */
-#line 55 "calc5.y"
+#line 59 "calc51.y"
                                          { (yyval.valor) = (yyvsp[-1].valor); }
-#line 1175 "calc5.tab.c"
+#line 1224 "calc51.tab.c"
     break;
 
 
-#line 1179 "calc5.tab.c"
+#line 1228 "calc51.tab.c"
 
       default: break;
     }
@@ -1368,7 +1417,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 57 "calc5.y"
+#line 61 "calc51.y"
 
 
 
@@ -1380,7 +1429,7 @@ char *mensaje ;
 {
     fprintf (stderr, "%s en la linea %d\n", mensaje, n_linea) ;
 }
-/*
+
 int yylex ()
 {
     unsigned char c ;
@@ -1409,7 +1458,7 @@ int yylex ()
           n_linea++ ;
     return c;
 }
-*/
+
 int main ()
 {
     yyparse () ;

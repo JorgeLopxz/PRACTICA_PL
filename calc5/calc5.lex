@@ -3,7 +3,7 @@
      100508621@alumnos.uc3m.es, 100495876@alumnos.uc3m.es
 */
 %{                            /* Primera Seccion */
-#include "calc5.tab.h"        /* Cabecera con decl. de token etc. */
+#include "calc52.tab.h"        /* Cabecera con decl. de token etc. */
 extern int n_linea;
 %}
 %%                            /* Segunda Seccion */
