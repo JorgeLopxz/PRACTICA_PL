@@ -1,6 +1,10 @@
+/*
+     Raoul Vlad Ivaszuk Ivaszuk, Jorge Lopez Alonso 509
+     100508621@alumnos.uc3m.es, 100495876@alumnos.uc3m.es
+*/
 %{                      /* SECCION 1 */
 #include <stdio.h>
-double memoria [26] ;   /* Se define una zona de memoria para las variables */
+double memoria [52] ;   /* Se define una zona de memoria para las variables */
 
 int yyerror () ;
 int yylex () ;
@@ -24,7 +28,12 @@ int yylex () ;
 axioma:       expresion '\n'              { printf ("Expresion=%lf\n", $1) ; } 
                        r_expr
             | VARIABLE '=' expresion '\n' { memoria [$1] = $3;
-                                            printf ("%c=%lf\n", $1+'A', $3);
+                                             if ($1 < 26){
+                                                  printf ("%c=%lf\n", $1+'A', $3);
+                                             }
+                                             else {
+                                                  printf ("%c=%lf\n", $1-26+'a', $3);
+                                             }
                                           }
              r_expr
             ;
@@ -60,7 +69,7 @@ char *mensaje ;
 {
     fprintf (stderr, "%s en la linea %d\n", mensaje, n_linea) ;
 }
-
+/*
 int yylex ()
 {
     unsigned char c ;
@@ -76,12 +85,12 @@ int yylex ()
     }
 
     if (c >= 'A' && c <= 'Z') {
-         yylval.indice = c - 'A' ;  /* resta a c el valor ascii de A */
+         yylval.indice = c - 'A' ;
          return VARIABLE ;
     }
 
     if (c >= 'a' && c <= 'z') {
-         yylval.indice = c - 'a' ;  /* resta a c el valor ascii de a  */
+         yylval.indice = c - 'a' + 26 ;
          return VARIABLE ;
     }
 
@@ -89,7 +98,7 @@ int yylex ()
           n_linea++ ;
     return c;
 }
-
+*/
 int main ()
 {
     yyparse () ;
