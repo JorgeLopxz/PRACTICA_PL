@@ -1,0 +1,13 @@
+variable A variable B variable C variable D variable E variable F variable G variable H variable I variable J variable K variable L variable M variable N variable O variable P variable Q variable R variable S variable T variable U variable V variable W variable X variable Y variable Z 
+: negate 0 swap - ; 
+3 2 * .
+1 2 + 3 + .
+1 2 3 * + .
+1 2 + 3 * .
+6 A !
+3 2 * A !
+A @ .
+A @ 10 * 23 10 / + B !
+B @ .
+5 negate 3 + .
+10 2 negate * .
