@@ -12,6 +12,10 @@
 
 void ParseYourGrammar(); /// Dummy Parser
 void ParseAxiom();       /// Prototype for forward reference
+void ParseExpression();
+void ParseRest();
+
+void PrintCurrentAtom();
 
 struct s_tokens
 {
@@ -133,8 +137,104 @@ void MatchSymbol(int expected_token)
 // #define ParseRParen() 	MatchSymbol (')') ; ///   rather than using functions
 /// The actual recomendation is to use MatchSymbol in the code rather than theese macros
 
+void PrintCurrentAtom()
+{
+    if (tokens.token == T_NUMBER)
+    {
+        printf("%d", tokens.number);
+        MatchSymbol(T_NUMBER);
+        return;
+    }
+
+    if (tokens.token == T_VARIABLE)
+    {
+        printf("%s", tokens.variable_name);
+        MatchSymbol(T_VARIABLE);
+        return;
+    }
+
+    rd_syntax_error(-1, tokens.token, "-- Expected Number/Variable, but %d was read\n");
+}
+
+void ParseRest()
+{
+    if (tokens.token == T_OPERATOR)
+    {
+        int op = tokens.token_val;
+        MatchSymbol(T_OPERATOR);
+
+        printf("(");
+        ParseExpression();
+        printf(" %c ", op);
+        ParseExpression();
+        printf(")");
+        return;
+    }
+
+    if (tokens.token == '=')
+    {
+        MatchSymbol('=');
+        if (tokens.token != T_VARIABLE)
+        {
+            rd_syntax_error(T_VARIABLE, tokens.token, "token %d expected after '=', but %d was read\n");
+        }
+
+        printf("(");
+        printf("%s", tokens.variable_name);
+        MatchSymbol(T_VARIABLE);
+        printf(" = ");
+        ParseExpression();
+
+        if (tokens.token != ')')
+        {
+            printf(" ? ");
+            ParseExpression();
+            printf(" : ");
+            ParseExpression();
+        }
+
+        printf(")");
+        return;
+    }
+
+    if (tokens.token == '?')
+    {
+        MatchSymbol('?');
+        printf("(");
+        ParseExpression();
+        printf(" ? ");
+        ParseExpression();
+        printf(" : ");
+        ParseExpression();
+        printf(")");
+        return;
+    }
+
+    rd_syntax_error(-1, tokens.token, "-- Unexpected token %d in operator position\n");
+}
+
+void ParseExpression()
+{
+    if (tokens.token == T_NUMBER || tokens.token == T_VARIABLE)
+    {
+        PrintCurrentAtom();
+        return;
+    }
+
+    if (tokens.token == '(')
+    {
+        MatchSymbol('(');
+        ParseRest();
+        MatchSymbol(')');
+        return;
+    }
+
+    rd_syntax_error(-1, tokens.token, "-- Unexpected token %d while parsing expression\n");
+}
+
 void ParseYourGrammar()
 {
+    ParseExpression();
 }
 
 void ParseAxiom()
