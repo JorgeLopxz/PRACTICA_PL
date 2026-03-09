@@ -12,10 +12,12 @@
 
 void ParseYourGrammar(); /// Dummy Parser
 void ParseAxiom();       /// Prototype for forward reference
-void ParseExpression();
-void ParseRest();
-
-void PrintCurrentAtom();
+void ParseExpresion();
+void ParseResto();
+void ParseCondicion();
+void ParseNumero();
+void ParseVariable();
+void ParseOperador();
 
 struct s_tokens
 {
@@ -137,62 +139,82 @@ void MatchSymbol(int expected_token)
 // #define ParseRParen() 	MatchSymbol (')') ; ///   rather than using functions
 /// The actual recomendation is to use MatchSymbol in the code rather than theese macros
 
-void PrintCurrentAtom()
+// Expresion -> ( Resto ) | Numero | Variable
+// Resto -> Operador Expresion Expresion | = Variable Expresion Condicion | ? Expresion Expresion Expresion
+// Condicion -> lambda | Expresion Expresion
+// Operador -> + | - | * | /
+// Numero -> [0-9]+
+// Variable -> [a-zA-Z][a-zA-Z0-9]?
+
+void ParseNumero()
 {
-    if (tokens.token == T_NUMBER)
-    {
-        printf("%d", tokens.number);
-        MatchSymbol(T_NUMBER);
-        return;
-    }
-
-    if (tokens.token == T_VARIABLE)
-    {
-        printf("%s", tokens.variable_name);
-        MatchSymbol(T_VARIABLE);
-        return;
-    }
-
-    rd_syntax_error(-1, tokens.token, "-- Expected Number/Variable, but %d was read\n");
+    printf("%d", tokens.number);
+    MatchSymbol(T_NUMBER);
 }
 
-void ParseRest()
+void ParseVariable()
+{
+    printf("%s", tokens.variable_name);
+    MatchSymbol(T_VARIABLE);
+}
+
+void ParseOperador()
+{
+    MatchSymbol(T_OPERATOR);
+}
+
+void ParseCondicion()
+{
+    // Condicion -> lambda
+    if (tokens.token == ')')
+    {
+        return;
+    }
+
+    // Condicion -> Expresion Expresion
+    if (tokens.token == '(' || tokens.token == T_NUMBER || tokens.token == T_VARIABLE)
+    {
+        printf(" ? ");
+        ParseExpresion();
+        printf(" : ");
+        ParseExpresion();
+        return;
+    }
+
+    rd_syntax_error(-1, tokens.token, "-- Unexpected token %d while parsing conditional tail\n");
+}
+
+void ParseResto()
 {
     if (tokens.token == T_OPERATOR)
     {
         int op = tokens.token_val;
-        MatchSymbol(T_OPERATOR);
 
+        ParseOperador();
         printf("(");
-        ParseExpression();
+        ParseExpresion();
         printf(" %c ", op);
-        ParseExpression();
+        ParseExpresion();
         printf(")");
         return;
     }
 
     if (tokens.token == '=')
     {
+        char lhs_name[8];
+
         MatchSymbol('=');
         if (tokens.token != T_VARIABLE)
         {
             rd_syntax_error(T_VARIABLE, tokens.token, "token %d expected after '=', but %d was read\n");
         }
 
-        printf("(");
-        printf("%s", tokens.variable_name);
+        strcpy(lhs_name, tokens.variable_name);
         MatchSymbol(T_VARIABLE);
-        printf(" = ");
-        ParseExpression();
 
-        if (tokens.token != ')')
-        {
-            printf(" ? ");
-            ParseExpression();
-            printf(" : ");
-            ParseExpression();
-        }
-
+        printf("(%s = ", lhs_name);
+        ParseExpresion();
+        ParseCondicion();
         printf(")");
         return;
     }
@@ -201,11 +223,11 @@ void ParseRest()
     {
         MatchSymbol('?');
         printf("(");
-        ParseExpression();
+        ParseExpresion();
         printf(" ? ");
-        ParseExpression();
+        ParseExpresion();
         printf(" : ");
-        ParseExpression();
+        ParseExpresion();
         printf(")");
         return;
     }
@@ -213,19 +235,25 @@ void ParseRest()
     rd_syntax_error(-1, tokens.token, "-- Unexpected token %d in operator position\n");
 }
 
-void ParseExpression()
+void ParseExpresion()
 {
-    if (tokens.token == T_NUMBER || tokens.token == T_VARIABLE)
-    {
-        PrintCurrentAtom();
-        return;
-    }
-
     if (tokens.token == '(')
     {
         MatchSymbol('(');
-        ParseRest();
+        ParseResto();
         MatchSymbol(')');
+        return;
+    }
+
+    if (tokens.token == T_NUMBER)
+    {
+        ParseNumero();
+        return;
+    }
+
+    if (tokens.token == T_VARIABLE)
+    {
+        ParseVariable();
         return;
     }
 
@@ -234,7 +262,7 @@ void ParseExpression()
 
 void ParseYourGrammar()
 {
-    ParseExpression();
+    ParseExpresion();
 }
 
 void ParseAxiom()
