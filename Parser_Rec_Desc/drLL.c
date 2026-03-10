@@ -11,6 +11,7 @@
 #define T_VARIABLE 1003
 
 void ParseAxiom();
+void ParseExpresion();
 void ParseResto();
 void ParseCondicion();
 void ParseNumero();
@@ -137,6 +138,7 @@ void MatchSymbol(int expected_token)
 // #define ParseRParen() MatchSymbol(')'); //   rather than using functions
 // The actual recomendation is to use MatchSymbol in the code rather than theese macros
 
+// Linea -> Expresion \n | \n
 // Expresion -> ( Resto ) | Numero | Variable
 // Resto -> Operador Expresion Expresion | = Variable Expresion Condicion | ? Expresion Expresion Expresion
 // Condicion -> lambda | Expresion Expresion
@@ -173,9 +175,9 @@ void ParseCondicion() // Condicion -> lambda | Expresion Expresion
     if (tokens.token == '(' || tokens.token == T_NUMBER || tokens.token == T_VARIABLE) // Conjunto Primero(Expresión)
     {
         printf(" ? ");
-        ParseAxiom();
+        ParseExpresion();
         printf(" : ");
-        ParseAxiom();
+        ParseExpresion();
         return;
     }
     // ERROR
@@ -191,9 +193,9 @@ void ParseResto() // Resto -> Operador Expresion Expresion | = Variable Expresio
 
         ParseOperador();
         printf("(");
-        ParseAxiom();
+        ParseExpresion();
         printf(" %c ", op);
-        ParseAxiom();
+        ParseExpresion();
         printf(")");
         return;
     }
@@ -212,7 +214,7 @@ void ParseResto() // Resto -> Operador Expresion Expresion | = Variable Expresio
         MatchSymbol(T_VARIABLE);
 
         printf("(%s = ", lhs_name);
-        ParseAxiom();
+        ParseExpresion();
         ParseCondicion();
         printf(")");
         return;
@@ -222,11 +224,11 @@ void ParseResto() // Resto -> Operador Expresion Expresion | = Variable Expresio
     {
         MatchSymbol('?');
         printf("(");
-        ParseAxiom();
+        ParseExpresion();
         printf(" ? ");
-        ParseAxiom();
+        ParseExpresion();
         printf(" : ");
-        ParseAxiom();
+        ParseExpresion();
         printf(")");
         return;
     }
@@ -234,14 +236,8 @@ void ParseResto() // Resto -> Operador Expresion Expresion | = Variable Expresio
     rd_syntax_error(-1, tokens.token, "-- Unexpected token %d in operator position\n");
 }
 
-void ParseAxiom() // Expresión -> ( Resto ) | Número | Variable
+void ParseExpresion() // Expresión -> ( Resto ) | Número | Variable
 {
-    // Salto de linea
-    while (tokens.token == '\n')
-    {
-        printf("\n");
-        MatchSymbol('\n');
-    }
     // Expresión -> ( Resto )
     if (tokens.token == '(')
     {
@@ -264,6 +260,14 @@ void ParseAxiom() // Expresión -> ( Resto ) | Número | Variable
     }
     // ERROR
     rd_syntax_error(-1, tokens.token, "-- Unexpected token %d while parsing expression\n");
+}
+
+void ParseAxiom() // Linea -> Expresion \n | \n
+{
+    // Linea -> Expresion \n
+    ParseExpresion();
+    printf("\n");
+    MatchSymbol('\n');
 }
 
 int main(int argc, char **argv)
