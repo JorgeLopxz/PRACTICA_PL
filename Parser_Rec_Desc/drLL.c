@@ -10,9 +10,7 @@
 #define T_OPERATOR 1002
 #define T_VARIABLE 1003
 
-void ParseYourGrammar(); /// Dummy Parser
-void ParseAxiom();       /// Prototype for forward reference
-void ParseExpresion();
+void ParseAxiom();
 void ParseResto();
 void ParseCondicion();
 void ParseNumero();
@@ -146,59 +144,60 @@ void MatchSymbol(int expected_token)
 // Numero -> [0-9]+
 // Variable -> [a-zA-Z][a-zA-Z0-9]?
 
-void ParseNumero()
+void ParseNumero() // Numero -> [0-9]+
 {
     printf("%d", tokens.number);
     MatchSymbol(T_NUMBER);
 }
 
-void ParseVariable()
+void ParseVariable() // Variable -> [a-zA-Z][a-zA-Z0-9]?
 {
     printf("%s", tokens.variable_name);
     MatchSymbol(T_VARIABLE);
 }
 
-void ParseOperador()
+void ParseOperador() // Operador -> + | - | * | /
 {
     MatchSymbol(T_OPERATOR);
 }
 
-void ParseCondicion()
+void ParseCondicion() // Condicion -> lambda | Expresion Expresion
 {
     // Condicion -> lambda
-    if (tokens.token == ')')
+    if (tokens.token == ')') // Conjunto Siguiente(Condicion)
     {
         return;
     }
 
     // Condicion -> Expresion Expresion
-    if (tokens.token == '(' || tokens.token == T_NUMBER || tokens.token == T_VARIABLE)
+    if (tokens.token == '(' || tokens.token == T_NUMBER || tokens.token == T_VARIABLE) // Conjunto Primero(Expresión)
     {
         printf(" ? ");
-        ParseExpresion();
+        ParseAxiom();
         printf(" : ");
-        ParseExpresion();
+        ParseAxiom();
         return;
     }
-
+    // ERROR
     rd_syntax_error(-1, tokens.token, "-- Unexpected token %d while parsing conditional tail\n");
 }
 
-void ParseResto()
+void ParseResto() // Resto -> Operador Expresion Expresion | = Variable Expresion Condicion | ? Expresion Expresion Expresion
 {
+    // Resto -> Operador Expresión Expresión
     if (tokens.token == T_OPERATOR)
     {
         int op = tokens.token_val;
 
         ParseOperador();
         printf("(");
-        ParseExpresion();
+        ParseAxiom();
         printf(" %c ", op);
-        ParseExpresion();
+        ParseAxiom();
         printf(")");
         return;
     }
-
+    // Resto -> = Variable Expresión Condición
     if (tokens.token == '=')
     {
         char lhs_name[8];
@@ -213,21 +212,21 @@ void ParseResto()
         MatchSymbol(T_VARIABLE);
 
         printf("(%s = ", lhs_name);
-        ParseExpresion();
+        ParseAxiom();
         ParseCondicion();
         printf(")");
         return;
     }
-
+    // Resto -> ? Expresión Expresión Expresión
     if (tokens.token == '?')
     {
         MatchSymbol('?');
         printf("(");
-        ParseExpresion();
+        ParseAxiom();
         printf(" ? ");
-        ParseExpresion();
+        ParseAxiom();
         printf(" : ");
-        ParseExpresion();
+        ParseAxiom();
         printf(")");
         return;
     }
@@ -235,114 +234,36 @@ void ParseResto()
     rd_syntax_error(-1, tokens.token, "-- Unexpected token %d in operator position\n");
 }
 
-void ParseExpresion()
-{
-    if (tokens.token == '(')
-    {
-        MatchSymbol('(');
-        ParseResto();
-        MatchSymbol(')');
-        return;
-    }
-
-    if (tokens.token == T_NUMBER)
-    {
-        ParseNumero();
-        return;
-    }
-
-    if (tokens.token == T_VARIABLE)
-    {
-        ParseVariable();
-        return;
-    }
-
-    rd_syntax_error(-1, tokens.token, "-- Unexpected token %d while parsing expression\n");
-}
-
-void ParseYourGrammar()
-{
-    ParseExpresion();
-}
-
-void ParseOperador() // Operador -> + | - | * | /
-{
-    MatchSymbol(T_OPERATOR);
-}
-
-void ParseCondicion() // Condición -> Lambda | Expresión Expresión
-{
-    // Condición -> Lambda
-    if (tokens.token == ')') // Se verifica el conjunto Siguiente(Condición)
-    {
-        return tokens.token;
-    }
-    // Condición -> Expresión Expresión
-    else if (tokens.token == T_VARIABLE || tokens.token == '(' || tokens.token == T_NUMBER) // Verificamos el conjunto Primero(Expresion)
-    {
-        ParseAxiom();
-        ParseAxiom();
-    }
-    else // ERROR
-    {
-        rd_syntax_error(-1, tokens.token, "-- Unexpected Token (Expected:%d=None, Read:%d) at end of Parsing\n");
-    }
-}
-
-void ParseResto() // Resto -> Operador Expresión Expresión | = Variable Expresión Condición | ? Expresión Expresión Expresión
-{
-    // Resto -> Operador Expresión Expresión
-    if (tokens.token == T_OPERATOR)
-    {
-        ParseOperador();
-        ParseAxiom();
-        ParseAxiom();
-    }
-    // Resto -> = Variable Expresión Condición
-    else if (tokens.token == '=')
-    {
-        MatchSymbol('=');
-        ParseVariable();
-        ParseAxiom();
-        ParseCondicion();
-    }
-    // Resto -> ? Expresión Expresión Expresión
-    else if (tokens.token == '?')
-    {
-        MatchSymbol('?');
-        ParseAxiom();
-        ParseAxiom();
-        ParseAxiom();
-    }
-    else // ERROR
-    {
-        rd_syntax_error(-1, tokens.token, "-- Unexpected Token (Expected:%d=None, Read:%d) at end of Parsing\n");
-    }
-}
-
 void ParseAxiom() // Expresión -> ( Resto ) | Número | Variable
 {
+    // Salto de linea
+    while (tokens.token == '\n')
+    {
+        printf("\n");
+        MatchSymbol('\n');
+    }
     // Expresión -> ( Resto )
     if (tokens.token == '(')
     {
         MatchSymbol('(');
         ParseResto();
         MatchSymbol(')');
+        return;
     }
     // Expresión -> Número
-    else if (tokens.token == T_NUMBER)
+    if (tokens.token == T_NUMBER)
     {
         ParseNumero();
+        return;
     }
     // Expresión -> Variable
-    else if (tokens.token == T_VARIABLE)
+    if (tokens.token == T_VARIABLE)
     {
         ParseVariable();
+        return;
     }
-    else // ERROR
-    {
-        rd_syntax_error(-1, tokens.token, "-- Unexpected Token (Expected:%d=None, Read:%d) at end of Parsing\n");
-    }
+    // ERROR
+    rd_syntax_error(-1, tokens.token, "-- Unexpected token %d while parsing expression\n");
 }
 
 int main(int argc, char **argv)
@@ -366,7 +287,7 @@ int main(int argc, char **argv)
     do
     {
         ParseAxiom();
-        //		printf ("\n") ;
+        // printf("\n");
     } while (flagMultiple);
 
     exit(0);
