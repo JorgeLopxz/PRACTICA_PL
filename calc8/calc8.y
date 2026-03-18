@@ -12,8 +12,6 @@ char temp [2048] ;
 
 #define FF fflush(stdout);
 
-// --- INICIO CÓDIGO AST ---
-
 // Estructura del nodo del Árbol de Sintaxis Abstracta (AST)
 typedef struct ASTnode t_node;
 struct ASTnode {
@@ -43,20 +41,20 @@ void freeAST (t_node *node) {
     }
 }
 
-// Función para imprimir el AST en notación prefija (LISP)
+// Función para imprimir el AST en notación prefija
 void printAST2Prefix (t_node *node) {
     if (node == NULL) return;
     
     if (node->type == 0) {
-        // Nodo Hoja (Número o Variable)
+        // Nodo Hoja
         printf("%s", node->op);
     } else if (node->type == 1) {
-        // Nodo Unario (ej. print o menos unario)
+        // Nodo Unario
         printf("(%s ", node->op);
         printAST2Prefix(node->left);
         printf(")");
     } else {
-        // Nodo Binario (+, -, *, /, setq)
+        // Nodo Binario
         printf("(%s ", node->op);
         printAST2Prefix(node->left);
         printf(" ");
@@ -64,7 +62,6 @@ void printAST2Prefix (t_node *node) {
         printf(")");
     }
 }
-// --- FIN CÓDIGO AST ---
 
 char *mi_malloc (int nbytes)
 {
@@ -113,7 +110,7 @@ typedef struct s_attr {
     int valor ;
 	int indice ;
     char *cadena ;
-    t_node *node ; // ¡NUEVO! Campo para enlazar el AST
+    t_node *node ; 
 } t_attr ;
 
 #define YYSTYPE t_attr
