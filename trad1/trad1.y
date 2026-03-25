@@ -1,3 +1,5 @@
+//  509 , Raoul Vlad Ivaszuk Ivaszuk , Jorge Lopez Alonso
+//  100508621@alumnos.uc3m.es , 100495876@alumnos.uc3m.es
 %{                          // SECCION 1 Declaraciones de C-Yacc
 
 #include <stdio.h>
@@ -70,8 +72,22 @@ sentencia:    IDENTIF '=' expresion      { sprintf (temp, "(setq %s %s)", $1.cod
                                            $$.code = gen_code (temp) ; }
             | '@' expresion              { sprintf (temp, "(print %s)", $2.code) ;  
                                            $$.code = gen_code (temp) ; }
+            | integer                    { sprintf (temp, "%s", $1.code);
+                                           $$.code = gen_code(temp);}
             ;
+
+integer:      INTEGER IDENTIF  r_integer                { sprintf (temp, "(setq %s %s)", $2.code, $3.code);
+                                                         $$.code = gen_code(temp); }
+            | INTEGER IDENTIF  r_integer ',' integer    { sprintf (temp, "(setq %s %s) %s", $2.code, $3.code, $5.code);
+                                                         $$.code = gen_code(temp); }
+;
           
+r_integer:                               { sprintf (temp, "0");
+                                           $$.code = gen_code(temp);}  // lambda  
+            | '=' NUMBER                 { sprintf (temp, "%s)", int_to_string($2.value));
+                                           $$.code = gen_code(temp);}
+            ;
+
 expresion:      termino                  { $$ = $1 ; }
             |   expresion '+' expresion  { sprintf (temp, "(+ %s %s)", $1.code, $3.code) ;
                                            $$.code = gen_code (temp) ; }
