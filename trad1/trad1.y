@@ -50,6 +50,7 @@ typedef struct s_attr {
 %token STRING
 %token MAIN          // identifica el comienzo del proc. main
 %token WHILE         // identifica el bucle main
+%token PUTS          // identifica la impresion de cadenas literales
 
 
 
@@ -100,6 +101,8 @@ bloque_sentencias:                       { $$.code = gen_code ("") ; }
 sentencia:    IDENTIF '=' expresion      { sprintf (temp, "(setq %s %s)", $1.code, $3.code) ; 
                                            $$.code = gen_code (temp) ; }
             | '@' expresion              { sprintf (temp, "(princ %s)", $2.code) ;  
+                                           $$.code = gen_code (temp) ; }
+            | PUTS '(' STRING ')'        { sprintf (temp, "(print \"%s\")", $3.code) ;
                                            $$.code = gen_code (temp) ; }
             ;
 
@@ -200,6 +203,7 @@ typedef struct s_keyword { // para las palabras reservadas de C
 t_keyword keywords [] = { // define las palabras reservadas y los
     "main",        MAIN,           // y los token asociados
     "int",         INTEGER,
+    "puts",        PUTS,
     NULL,          0               // para marcar el fin de la tabla
 } ;
 
