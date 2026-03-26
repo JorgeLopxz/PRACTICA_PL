@@ -60,20 +60,47 @@ typedef struct s_attr {
 
 %%                            // Seccion 3 Gramatica - Semantico
 
-axioma:       sentencia ';'              { printf ("%s\n", $1.code) ; }
-                r_axioma                 { ; }
+axioma:         dec_variables def_func   {
+                                            if (strlen ($1.code) > 0) {
+                                                printf ("%s\n", $1.code) ;
+                                            }
+                                            printf ("%s\n", $2.code) ;
+                                            printf ("//@ (main)\n") ;
+                                        }
             ;
 
-r_axioma:                                { ; }
-            |   axioma                   { ; }
+dec_variables:                         { $$.code = gen_code ("") ; }
+            |   dec_variables integer ';'   {
+                                            if (strlen ($1.code) > 0) {
+                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                            } else {
+                                                sprintf (temp, "%s", $2.code) ;
+                                            }
+                                            $$.code = gen_code (temp) ;
+                                        }
+            ;
+
+def_func:    MAIN '(' ')' '{' bloque_sentencias '}' {
+                                            sprintf (temp, "(defun main ()\n%s\n)", $5.code) ;
+                                            $$.code = gen_code (temp) ;
+                                        }
+            ;
+
+bloque_sentencias:                       { $$.code = gen_code ("") ; }
+            |   bloque_sentencias sentencia ';' {
+                                            if (strlen ($1.code) > 0) {
+                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                            } else {
+                                                sprintf (temp, "%s", $2.code) ;
+                                            }
+                                            $$.code = gen_code (temp) ;
+                                        }
             ;
 
 sentencia:    IDENTIF '=' expresion      { sprintf (temp, "(setq %s %s)", $1.code, $3.code) ; 
                                            $$.code = gen_code (temp) ; }
-            | '@' expresion              { sprintf (temp, "(print %s)", $2.code) ;  
+            | '@' expresion              { sprintf (temp, "(princ %s)", $2.code) ;  
                                            $$.code = gen_code (temp) ; }
-            | integer                    { sprintf (temp, "%s", $1.code);
-                                           $$.code = gen_code(temp);}
             ;
 
 integer:      INTEGER IDENTIF  r_integer                { sprintf (temp, "(setq %s %s)", $2.code, $3.code);
