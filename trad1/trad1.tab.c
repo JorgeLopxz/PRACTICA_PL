@@ -132,7 +132,51 @@ typedef struct s_attr {
 #  endif
 # endif
 
-#include "trad1.tab.h"
+
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token kinds.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    NUMBER = 258,                  /* NUMBER  */
+    IDENTIF = 259,                 /* IDENTIF  */
+    INTEGER = 260,                 /* INTEGER  */
+    STRING = 261,                  /* STRING  */
+    MAIN = 262,                    /* MAIN  */
+    WHILE = 263,                   /* WHILE  */
+    PUTS = 264,                    /* PUTS  */
+    UNARY_SIGN = 265               /* UNARY_SIGN  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
+#endif
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+typedef int YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
+#endif
+
+
+extern YYSTYPE yylval;
+
+
+int yyparse (void);
+
+
+
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -1153,13 +1197,13 @@ yyreduce:
                                             printf ("%s\n", yyvsp[0].code) ;
                                             printf ("//@ (main)\n") ;
                                         }
-#line 1157 "trad1.tab.c"
+#line 1201 "trad1.tab.c"
     break;
 
   case 3: /* dec_variables: %empty  */
 #line 73 "trad1.y"
                                        { yyval.code = gen_code ("") ; }
-#line 1163 "trad1.tab.c"
+#line 1207 "trad1.tab.c"
     break;
 
   case 4: /* dec_variables: dec_variables integer ';'  */
@@ -1172,7 +1216,7 @@ yyreduce:
                                             }
                                             yyval.code = gen_code (temp) ;
                                         }
-#line 1176 "trad1.tab.c"
+#line 1220 "trad1.tab.c"
     break;
 
   case 5: /* def_func: MAIN '(' ')' '{' bloque_sentencias '}'  */
@@ -1181,13 +1225,13 @@ yyreduce:
                                             sprintf (temp, "(defun main ()\n%s\n)", yyvsp[-1].code) ;
                                             yyval.code = gen_code (temp) ;
                                         }
-#line 1185 "trad1.tab.c"
+#line 1229 "trad1.tab.c"
     break;
 
   case 6: /* bloque_sentencias: %empty  */
 #line 90 "trad1.y"
                                          { yyval.code = gen_code ("") ; }
-#line 1191 "trad1.tab.c"
+#line 1235 "trad1.tab.c"
     break;
 
   case 7: /* bloque_sentencias: bloque_sentencias sentencia ';'  */
@@ -1200,133 +1244,133 @@ yyreduce:
                                             }
                                             yyval.code = gen_code (temp) ;
                                         }
-#line 1204 "trad1.tab.c"
+#line 1248 "trad1.tab.c"
     break;
 
   case 8: /* sentencia: IDENTIF '=' expresion  */
 #line 101 "trad1.y"
                                          { sprintf (temp, "(setq %s %s)", yyvsp[-2].code, yyvsp[0].code) ; 
                                            yyval.code = gen_code (temp) ; }
-#line 1211 "trad1.tab.c"
+#line 1255 "trad1.tab.c"
     break;
 
   case 9: /* sentencia: '@' expresion  */
 #line 103 "trad1.y"
                                          { sprintf (temp, "(princ %s)", yyvsp[0].code) ;  
                                            yyval.code = gen_code (temp) ; }
-#line 1218 "trad1.tab.c"
+#line 1262 "trad1.tab.c"
     break;
 
   case 10: /* sentencia: PUTS '(' STRING ')'  */
 #line 105 "trad1.y"
                                          { sprintf (temp, "(print \"%s\")", yyvsp[-1].code) ;
                                            yyval.code = gen_code (temp) ; }
-#line 1225 "trad1.tab.c"
+#line 1269 "trad1.tab.c"
     break;
 
   case 11: /* integer: INTEGER IDENTIF r_integer  */
 #line 109 "trad1.y"
                                                         { sprintf (temp, "(setq %s %s)", yyvsp[-1].code, yyvsp[0].code);
                                                          yyval.code = gen_code(temp); }
-#line 1232 "trad1.tab.c"
+#line 1276 "trad1.tab.c"
     break;
 
   case 12: /* integer: INTEGER IDENTIF r_integer ',' integer  */
 #line 111 "trad1.y"
                                                         { sprintf (temp, "(setq %s %s) %s", yyvsp[-3].code, yyvsp[-2].code, yyvsp[0].code);
                                                          yyval.code = gen_code(temp); }
-#line 1239 "trad1.tab.c"
+#line 1283 "trad1.tab.c"
     break;
 
   case 13: /* r_integer: %empty  */
 #line 115 "trad1.y"
                                          { sprintf (temp, "0");
                                            yyval.code = gen_code(temp);}
-#line 1246 "trad1.tab.c"
+#line 1290 "trad1.tab.c"
     break;
 
   case 14: /* r_integer: '=' NUMBER  */
 #line 117 "trad1.y"
                                          { sprintf (temp, "%s)", int_to_string(yyvsp[0].value));
                                            yyval.code = gen_code(temp);}
-#line 1253 "trad1.tab.c"
+#line 1297 "trad1.tab.c"
     break;
 
   case 15: /* expresion: termino  */
 #line 121 "trad1.y"
                                          { yyval = yyvsp[0] ; }
-#line 1259 "trad1.tab.c"
+#line 1303 "trad1.tab.c"
     break;
 
   case 16: /* expresion: expresion '+' expresion  */
 #line 122 "trad1.y"
                                          { sprintf (temp, "(+ %s %s)", yyvsp[-2].code, yyvsp[0].code) ;
                                            yyval.code = gen_code (temp) ; }
-#line 1266 "trad1.tab.c"
+#line 1310 "trad1.tab.c"
     break;
 
   case 17: /* expresion: expresion '-' expresion  */
 #line 124 "trad1.y"
                                          { sprintf (temp, "(- %s %s)", yyvsp[-2].code, yyvsp[0].code) ;
                                            yyval.code = gen_code (temp) ; }
-#line 1273 "trad1.tab.c"
+#line 1317 "trad1.tab.c"
     break;
 
   case 18: /* expresion: expresion '*' expresion  */
 #line 126 "trad1.y"
                                          { sprintf (temp, "(* %s %s)", yyvsp[-2].code, yyvsp[0].code) ;
                                            yyval.code = gen_code (temp) ; }
-#line 1280 "trad1.tab.c"
+#line 1324 "trad1.tab.c"
     break;
 
   case 19: /* expresion: expresion '/' expresion  */
 #line 128 "trad1.y"
                                          { sprintf (temp, "(/ %s %s)", yyvsp[-2].code, yyvsp[0].code) ;
                                            yyval.code = gen_code (temp) ; }
-#line 1287 "trad1.tab.c"
+#line 1331 "trad1.tab.c"
     break;
 
   case 20: /* termino: operando  */
 #line 132 "trad1.y"
                                                    { yyval = yyvsp[0] ; }
-#line 1293 "trad1.tab.c"
+#line 1337 "trad1.tab.c"
     break;
 
   case 21: /* termino: '+' operando  */
 #line 133 "trad1.y"
                                                    { yyval = yyvsp[-1] ; }
-#line 1299 "trad1.tab.c"
+#line 1343 "trad1.tab.c"
     break;
 
   case 22: /* termino: '-' operando  */
 #line 134 "trad1.y"
                                                    { sprintf (temp, "(- %s)", yyvsp[0].code) ;
                                                      yyval.code = gen_code (temp) ; }
-#line 1306 "trad1.tab.c"
+#line 1350 "trad1.tab.c"
     break;
 
   case 23: /* operando: IDENTIF  */
 #line 138 "trad1.y"
                                          { sprintf (temp, "%s", yyvsp[0].code) ;
                                            yyval.code = gen_code (temp) ; }
-#line 1313 "trad1.tab.c"
+#line 1357 "trad1.tab.c"
     break;
 
   case 24: /* operando: NUMBER  */
 #line 140 "trad1.y"
                                          { sprintf (temp, "%d", yyvsp[0].value) ;
                                            yyval.code = gen_code (temp) ; }
-#line 1320 "trad1.tab.c"
+#line 1364 "trad1.tab.c"
     break;
 
   case 25: /* operando: '(' expresion ')'  */
 #line 142 "trad1.y"
                                          { yyval = yyvsp[-1] ; }
-#line 1326 "trad1.tab.c"
+#line 1370 "trad1.tab.c"
     break;
 
 
-#line 1330 "trad1.tab.c"
+#line 1374 "trad1.tab.c"
 
       default: break;
     }
