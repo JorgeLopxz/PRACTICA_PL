@@ -103,12 +103,17 @@ sentencia:    IDENTIF '=' expresion      { sprintf (temp, "(setq %s %s)", $1.cod
                                            $$.code = gen_code (temp) ; }
             | PUTS '(' STRING ')'        { sprintf (temp, "(print \"%s\")", $3.code) ;
                                            $$.code = gen_code (temp) ; }
-            | PRINTF '(' STRING ',' elem_print ')' { sprintf (temp, "(princ %s)", $5.code) ;
-                                           $$.code = gen_code (temp) ; }
+            | PRINTF '(' STRING ',' lista_print ')' { $$ = $5 ; }
             ;
 
 elem_print:    expresion                 { $$ = $1 ; }
             |  STRING                    { sprintf (temp, "\"%s\"", $1.code) ;
+                                           $$.code = gen_code (temp) ; }
+            ;
+
+lista_print:   elem_print                { sprintf (temp, "(princ %s)", $1.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |  lista_print ',' elem_print { sprintf (temp, "%s\n(princ %s)", $1.code, $3.code) ;
                                            $$.code = gen_code (temp) ; }
             ;
 
