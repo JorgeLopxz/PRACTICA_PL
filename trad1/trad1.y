@@ -102,6 +102,14 @@ bloque_sentencias:                       { $$.code = gen_code ("") ; }
                                             }
                                             $$.code = gen_code (temp) ;
                                         }
+            |   bloque_sentencias sentencia_while {
+                                            if (strlen ($1.code) > 0) {
+                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                            } else {
+                                                sprintf (temp, "%s", $2.code) ;
+                                            }
+                                            $$.code = gen_code (temp) ;
+                                        }
             ;
 
 sentencia:    IDENTIF '=' expresion      { sprintf (temp, "(setq %s %s)", $1.code, $3.code) ; 
@@ -109,6 +117,17 @@ sentencia:    IDENTIF '=' expresion      { sprintf (temp, "(setq %s %s)", $1.cod
             | PUTS '(' STRING ')'        { sprintf (temp, "(print \"%s\")", $3.code) ;
                                            $$.code = gen_code (temp) ; }
             | PRINTF '(' STRING ',' lista_print ')' { $$ = $5 ; }
+            ;
+
+sentencia_while:
+              WHILE '(' expresion ')' '{' bloque_sentencias '}' {
+                                           if (strlen ($6.code) > 0) {
+                                               sprintf (temp, "(loop while %s do\n%s)", $3.code, $6.code) ;
+                                           } else {
+                                               sprintf (temp, "(loop while %s do)", $3.code) ;
+                                           }
+                                           $$.code = gen_code (temp) ;
+                                       }
             ;
 
 elem_print:    expresion                 { $$ = $1 ; }
@@ -239,6 +258,7 @@ typedef struct s_keyword { // para las palabras reservadas de C
 t_keyword keywords [] = { // define las palabras reservadas y los
     "main",        MAIN,           // y los token asociados
     "int",         INTEGER,
+    "while",       WHILE,
     "puts",        PUTS,
     "printf",      PRINTF,
     "&&",          AND,
