@@ -61,7 +61,8 @@ extern int yydebug;
     MAIN = 262,                    /* MAIN  */
     WHILE = 263,                   /* WHILE  */
     PUTS = 264,                    /* PUTS  */
-    UNARY_SIGN = 265               /* UNARY_SIGN  */
+    PRINTF = 265,                  /* PRINTF  */
+    UNARY_SIGN = 266               /* UNARY_SIGN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
