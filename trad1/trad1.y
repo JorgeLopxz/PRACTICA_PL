@@ -16,6 +16,9 @@ char *mi_malloc (int) ;
 char *gen_code (char *) ;
 char *int_to_string (int) ;
 char *char_to_string (char) ;
+void add_local(char* nombre) ;
+int es_local(char* nombre) ;
+char* get_var_name(char* id) ;
 
 char temp [2048] ;
 
@@ -54,6 +57,8 @@ typedef struct s_attr {
 %token PUTS          // identifica la impresion de cadenas literales
 %token PRINTF        // identifica la impresion con formato
 %token AND OR EQ NE LE GE
+%token IF
+%token ELSE
 
 
 
@@ -86,8 +91,25 @@ dec_var:                                                    { $$.code = gen_code
                                                             }
             ;
 
-def_func:       MAIN '(' ')' '{' bq_sent '}'                { sprintf (temp, "(defun main ()\n%s\n)", $5.code) ;
-                                                              $$.code = gen_code (temp) ; }
+dec_var_local:                                                  { $$.code = gen_code ("") ; } // lambda
+            |   dec_var_local integer_local ';'                 { if (strlen ($1.code) > 0) {
+                                                                    sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                } else {
+                                                                    sprintf (temp, "%s", $2.code) ;
+                                                                }
+                                                                $$.code = gen_code (temp) ; }
+            ;
+
+integer_local:  INTEGER IDENTIF r_integer                       { add_local($2.code); // La guardamos en la tabla
+                                                                  sprintf (temp, "(setq main_%s %s)", $2.code, $3.code);
+                                                                  $$.code = gen_code(temp); }
+            |   INTEGER IDENTIF r_integer ',' integer_local     { add_local($2.code);
+                                                                  sprintf (temp, "(setq main_%s %s)\n%s", $2.code, $3.code, $5.code);
+                                                                  $$.code = gen_code(temp); }
+            ;
+
+def_func:       MAIN '(' ')' '{' dec_var_local bq_sent '}'      { sprintf (temp, "(defun main ()\n%s\n%s\n)", $5.code, $6.code) ;
+                                                                  $$.code = gen_code (temp) ; }
             ;
 
 bq_sent:                                                    { $$.code = gen_code ("") ; } //lambda
@@ -105,9 +127,16 @@ bq_sent:                                                    { $$.code = gen_code
                                                               }
                                                               $$.code = gen_code (temp) ;
                                                             }
+            |   bq_sent st_if                               { if (strlen ($1.code) > 0) {
+                                                              sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                              } else {
+                                                                sprintf (temp, "%s", $2.code) ;
+                                                              }
+                                                              $$.code = gen_code (temp) ; 
+                                                            }
             ;
 
-sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(setq %s %s)", $1.code, $3.code) ; 
+sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(setf %s %s)", get_var_name($1.code), $3.code) ; 
                                                               $$.code = gen_code (temp) ; }
             |   PUTS '(' STRING ')'                         { sprintf (temp, "(print \"%s\")", $3.code) ;
                                                               $$.code = gen_code (temp) ; }
@@ -121,6 +150,13 @@ st_while:       WHILE '(' expresion ')' '{' bq_sent '}'     { if (strlen ($6.cod
                                                               }
                                                               $$.code = gen_code (temp) ;
                                                             }
+            ;
+
+st_if:          IF '(' expresion ')' '{' bq_sent '}'                        { sprintf (temp, "(if %s\n(progn\n%s\n)\n)", $3.code, $6.code) ;
+                                                                              $$.code = gen_code (temp) ; }
+
+            |   IF '(' expresion ')' '{' bq_sent '}' ELSE '{' bq_sent '}'   { sprintf (temp, "(if %s\n(progn\n%s\n)\n(progn\n%s\n)\n)", $3.code,   $6.code, $10.code) ;
+                                                                              $$.code = gen_code (temp) ; }
             ;
 
 elem_print:     expresion                                   { $$ = $1 ; }
@@ -183,7 +219,7 @@ termino:        operando                                    { $$ = $1 ; }
                                                               $$.code = gen_code (temp) ; }
             ;
 
-operando:       IDENTIF                                     { sprintf (temp, "%s", $1.code) ;
+operando:       IDENTIF                                     { sprintf (temp, "%s", get_var_name($1.code)) ;
                                                               $$.code = gen_code (temp) ; }
             |   NUMBER                                      { sprintf (temp, "%d", $1.value) ;
                                                               $$.code = gen_code (temp) ; }
@@ -260,6 +296,8 @@ t_keyword keywords [] = { // define las palabras reservadas y los
     "!=",          NE,
     "<=",          LE,
     ">=",          GE,
+    "if",          IF,
+    "else",        ELSE,
     NULL,          0               // para marcar el fin de la tabla
 } ;
 
@@ -298,6 +336,33 @@ char *gen_code (char *name)     // copia el argumento a un
 	
     return p ;
 }
+
+/***************************************************************************/
+/******************* Seccion del Variables Locales *************************/
+/***************************************************************************/
+char tabla_locales[100][256]; // Tabla para guardar hasta 100 variables locales
+int num_locales = 0;
+
+void add_local(char* nombre) {
+    strcpy(tabla_locales[num_locales++], nombre);
+}
+
+int es_local(char* nombre) {
+    for(int i = 0; i < num_locales; i++) {
+        if(strcmp(tabla_locales[i], nombre) == 0) return 1;
+    }
+    return 0; // No está en la tabla, por lo que es global
+}
+
+char* get_var_name(char* id) {
+    if (es_local(id)) {
+        char temp_name[256];
+        sprintf(temp_name, "main_%s", id); // Le añade el prefijo
+        return gen_code(temp_name);
+    }
+    return id; // Si es global, devuelve el nombre tal cual
+}
+// ------------------------------------
 
 
 int yylex ()

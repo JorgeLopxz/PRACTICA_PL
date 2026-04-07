@@ -68,7 +68,9 @@ extern int yydebug;
     NE = 269,                      /* NE  */
     LE = 270,                      /* LE  */
     GE = 271,                      /* GE  */
-    UNARY_SIGN = 272               /* UNARY_SIGN  */
+    IF = 272,                      /* IF  */
+    ELSE = 273,                    /* ELSE  */
+    UNARY_SIGN = 274               /* UNARY_SIGN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
