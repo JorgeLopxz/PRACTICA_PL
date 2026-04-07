@@ -51,12 +51,18 @@ typedef struct s_attr {
 %token MAIN          // identifica el comienzo del proc. main
 %token WHILE         // identifica el bucle main
 %token PUTS          // identifica la impresion de cadenas literales
+%token PRINTF        // identifica la impresion con formato
+%token AND OR EQ NE LE GE
 
 
 
 %right '='                    // es la ultima operacion que se debe realizar
-%left '+' '-'                 // menor orden de precedencia
-%left '*' '/'                 // orden de precedencia intermedio
+%left OR
+%left AND
+%left EQ NE
+%left '<' '>' LE GE
+%left '+' '-'
+%left '*' '/' '%'
 %left UNARY_SIGN              // mayor orden de precedencia
 
 %%                            // Seccion 3 Gramatica - Semantico
@@ -96,13 +102,42 @@ bloque_sentencias:                       { $$.code = gen_code ("") ; }
                                             }
                                             $$.code = gen_code (temp) ;
                                         }
+            |   bloque_sentencias sentencia_while {
+                                            if (strlen ($1.code) > 0) {
+                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                            } else {
+                                                sprintf (temp, "%s", $2.code) ;
+                                            }
+                                            $$.code = gen_code (temp) ;
+                                        }
             ;
 
 sentencia:    IDENTIF '=' expresion      { sprintf (temp, "(setq %s %s)", $1.code, $3.code) ; 
                                            $$.code = gen_code (temp) ; }
-            | '@' expresion              { sprintf (temp, "(princ %s)", $2.code) ;  
-                                           $$.code = gen_code (temp) ; }
             | PUTS '(' STRING ')'        { sprintf (temp, "(print \"%s\")", $3.code) ;
+                                           $$.code = gen_code (temp) ; }
+            | PRINTF '(' STRING ',' lista_print ')' { $$ = $5 ; }
+            ;
+
+sentencia_while:
+              WHILE '(' expresion ')' '{' bloque_sentencias '}' {
+                                           if (strlen ($6.code) > 0) {
+                                               sprintf (temp, "(loop while %s do\n%s)", $3.code, $6.code) ;
+                                           } else {
+                                               sprintf (temp, "(loop while %s do)", $3.code) ;
+                                           }
+                                           $$.code = gen_code (temp) ;
+                                       }
+            ;
+
+elem_print:    expresion                 { $$ = $1 ; }
+            |  STRING                    { sprintf (temp, "\"%s\"", $1.code) ;
+                                           $$.code = gen_code (temp) ; }
+            ;
+
+lista_print:   elem_print                { sprintf (temp, "(princ %s)", $1.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |  lista_print ',' elem_print { sprintf (temp, "%s\n(princ %s)", $1.code, $3.code) ;
                                            $$.code = gen_code (temp) ; }
             ;
 
@@ -119,6 +154,22 @@ r_integer:                               { sprintf (temp, "0");
             ;
 
 expresion:      termino                  { $$ = $1 ; }
+            |   expresion OR expresion   { sprintf (temp, "(or %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |   expresion AND expresion  { sprintf (temp, "(and %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |   expresion EQ expresion   { sprintf (temp, "(= %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |   expresion NE expresion   { sprintf (temp, "(/= %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |   expresion '<' expresion  { sprintf (temp, "(< %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |   expresion LE expresion   { sprintf (temp, "(<= %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |   expresion '>' expresion  { sprintf (temp, "(> %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
+            |   expresion GE expresion   { sprintf (temp, "(>= %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
             |   expresion '+' expresion  { sprintf (temp, "(+ %s %s)", $1.code, $3.code) ;
                                            $$.code = gen_code (temp) ; }
             |   expresion '-' expresion  { sprintf (temp, "(- %s %s)", $1.code, $3.code) ;
@@ -127,12 +178,16 @@ expresion:      termino                  { $$ = $1 ; }
                                            $$.code = gen_code (temp) ; }
             |   expresion '/' expresion  { sprintf (temp, "(/ %s %s)", $1.code, $3.code) ;
                                            $$.code = gen_code (temp) ; }
+            |   expresion '%' expresion  { sprintf (temp, "(mod %s %s)", $1.code, $3.code) ;
+                                           $$.code = gen_code (temp) ; }
             ;
 
 termino:        operando                           { $$ = $1 ; }                          
             |   '+' operando %prec UNARY_SIGN      { $$ = $1 ; }
             |   '-' operando %prec UNARY_SIGN      { sprintf (temp, "(- %s)", $2.code) ;
                                                      $$.code = gen_code (temp) ; }    
+            |   '!' operando %prec UNARY_SIGN      { sprintf (temp, "(not %s)", $2.code) ;
+                                                     $$.code = gen_code (temp) ; }
             ;
 
 operando:       IDENTIF                  { sprintf (temp, "%s", $1.code) ;
@@ -203,7 +258,15 @@ typedef struct s_keyword { // para las palabras reservadas de C
 t_keyword keywords [] = { // define las palabras reservadas y los
     "main",        MAIN,           // y los token asociados
     "int",         INTEGER,
+    "while",       WHILE,
     "puts",        PUTS,
+    "printf",      PRINTF,
+    "&&",          AND,
+    "||",          OR,
+    "==",          EQ,
+    "!=",          NE,
+    "<=",          LE,
+    ">=",          GE,
     NULL,          0               // para marcar el fin de la tabla
 } ;
 
