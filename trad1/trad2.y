@@ -59,6 +59,9 @@ typedef struct s_attr {
 %token AND OR EQ NE LE GE
 %token IF
 %token ELSE
+%token FOR           // identifica el bucle for
+%token INC           // macro para incremento
+%token DEC           // macro para decremento
 
 
 
@@ -77,7 +80,6 @@ axioma:         dec_var def_func                            { if (strlen ($1.cod
                                                                 printf ("%s\n", $1.code) ;
                                                               }
                                                               printf ("%s\n", $2.code) ;
-                                                              printf ("//@ (main)\n") ; 
                                                             }
             ;
 
@@ -134,6 +136,13 @@ bq_sent:                                                    { $$.code = gen_code
                                                               }
                                                               $$.code = gen_code (temp) ; 
                                                             }
+            |   bq_sent st_for                              { if (strlen ($1.code) > 0) {
+                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                              } else {
+                                                                sprintf (temp, "%s", $2.code) ;
+                                                              }
+                                                              $$.code = gen_code (temp) ; 
+                                                            }
             ;
 
 sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(setf %s %s)", get_var_name($1.code), $3.code) ; 
@@ -141,6 +150,12 @@ sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(s
             |   PUTS '(' STRING ')'                         { sprintf (temp, "(print \"%s\")", $3.code) ;
                                                               $$.code = gen_code (temp) ; }
             |   PRINTF '(' STRING ',' lista_print ')'       { $$ = $5 ; }
+            ;
+        
+op_inc_dec:     INC '(' IDENTIF ')'         { sprintf (temp, "(setf %s (+ %s 1))", get_var_name($3.code), get_var_name($3.code)) ;
+                                              $$.code = gen_code (temp) ; }
+            |   DEC '(' IDENTIF ')'         { sprintf (temp, "(setf %s (- %s 1))", get_var_name($3.code), get_var_name($3.code)) ;
+                                              $$.code = gen_code (temp) ; }
             ;
 
 st_while:       WHILE '(' expresion ')' '{' bq_sent '}'     { if (strlen ($6.code) > 0) {
@@ -150,6 +165,19 @@ st_while:       WHILE '(' expresion ')' '{' bq_sent '}'     { if (strlen ($6.cod
                                                               }
                                                               $$.code = gen_code (temp) ;
                                                             }
+            ;
+
+st_for:         FOR '(' sentencia ';' expresion ';' op_inc_dec ')' '{' bq_sent '}' 
+                                { 
+                                    if (strlen ($10.code) > 0) {
+                                        // Si hay código en el bloque, el incremento va al final del bloque
+                                        sprintf (temp, "%s\n(loop while %s do\n%s\n%s)", $3.code, $5.code, $10.code, $7.code) ;
+                                    } else {
+                                        // Si el bloque está vacío, solo se ejecuta el incremento dentro del bucle
+                                        sprintf (temp, "%s\n(loop while %s do\n%s)", $3.code, $5.code, $7.code) ;
+                                    }
+                                    $$.code = gen_code (temp) ; 
+                                }
             ;
 
 st_if:          IF '(' expresion ')' '{' bq_sent '}'                        { sprintf (temp, "(if %s\n(progn\n%s\n)\n)", $3.code, $6.code) ;
@@ -288,6 +316,9 @@ t_keyword keywords [] = { // define las palabras reservadas y los
     "main",        MAIN,           // y los token asociados
     "int",         INTEGER,
     "while",       WHILE,
+    "for",         FOR,
+    "inc",         INC,            
+    "dec",         DEC,            
     "puts",        PUTS,
     "printf",      PRINTF,
     "&&",          AND,

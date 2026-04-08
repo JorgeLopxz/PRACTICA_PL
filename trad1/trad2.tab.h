@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_TRAD1_TAB_H_INCLUDED
-# define YY_YY_TRAD1_TAB_H_INCLUDED
+#ifndef YY_YY_TRAD2_TAB_H_INCLUDED
+# define YY_YY_TRAD2_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -70,7 +70,10 @@ extern int yydebug;
     GE = 271,                      /* GE  */
     IF = 272,                      /* IF  */
     ELSE = 273,                    /* ELSE  */
-    UNARY_SIGN = 274               /* UNARY_SIGN  */
+    FOR = 274,                     /* FOR  */
+    INC = 275,                     /* INC  */
+    DEC = 276,                     /* DEC  */
+    UNARY_SIGN = 277               /* UNARY_SIGN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -89,4 +92,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_TRAD1_TAB_H_INCLUDED  */
+#endif /* !YY_YY_TRAD2_TAB_H_INCLUDED  */
