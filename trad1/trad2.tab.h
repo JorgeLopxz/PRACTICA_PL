@@ -73,7 +73,11 @@ extern int yydebug;
     FOR = 274,                     /* FOR  */
     INC = 275,                     /* INC  */
     DEC = 276,                     /* DEC  */
-    UNARY_SIGN = 277               /* UNARY_SIGN  */
+    SWITCH = 277,                  /* SWITCH  */
+    CASE = 278,                    /* CASE  */
+    DEFAULT = 279,                 /* DEFAULT  */
+    BREAK = 280,                   /* BREAK  */
+    UNARY_SIGN = 281               /* UNARY_SIGN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

@@ -62,6 +62,7 @@ typedef struct s_attr {
 %token FOR           // identifica el bucle for
 %token INC           // macro para incremento
 %token DEC           // macro para decremento
+%token SWITCH CASE DEFAULT BREAK
 
 
 
@@ -147,6 +148,13 @@ bq_sent:                                                    { $$.code = gen_code
                                                               }
                                                               $$.code = gen_code (temp) ; 
                                                             }
+                        |   bq_sent st_switch                           { if (strlen ($1.code) > 0) {
+                                                                                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                                                                            } else {
+                                                                                                                                sprintf (temp, "%s", $2.code) ;
+                                                                                                                            }
+                                                                                                                            $$.code = gen_code (temp) ;
+                                                                                                                        }
             ;
 
 sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(setf %s %s)", get_var_name($1.code), $3.code) ; 
@@ -189,6 +197,42 @@ st_if:          IF '(' expresion ')' '{' bq_sent '}'                        { sp
 
             |   IF '(' expresion ')' '{' bq_sent '}' ELSE '{' bq_sent '}'   { sprintf (temp, "(if %s\n(progn\n%s\n)\n(progn\n%s\n)\n)", $3.code,   $6.code, $10.code) ;
                                                                               $$.code = gen_code (temp) ; }
+            ;
+
+st_switch:      SWITCH '(' expresion ')' '{' lista_cases opt_default '}'    {
+                                                                                if (strlen ($6.code) > 0) {
+                                                                                    sprintf (temp, "(case %s\n%s\n%s\n)", $3.code, $6.code, $7.code) ;
+                                                                                } else {
+                                                                                    sprintf (temp, "(case %s\n%s\n)", $3.code, $7.code) ;
+                                                                                }
+                                                                                $$.code = gen_code (temp) ;
+                                                                            }
+            ;
+
+lista_cases:    case_item                                                    { $$ = $1 ; }
+            |   lista_cases case_item                                         { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                                $$.code = gen_code (temp) ; }
+            ;
+
+case_item:      CASE NUMBER ':' bq_sent BREAK ';'                            {
+                                                                                if (strlen ($4.code) > 0) {
+                                                                                    sprintf (temp, "(%d\n%s\n)", $2.value, $4.code) ;
+                                                                                } else {
+                                                                                    sprintf (temp, "(%d)", $2.value) ;
+                                                                                }
+                                                                                $$.code = gen_code (temp) ;
+                                                                            }
+            ;
+
+opt_default:                                                                { $$.code = gen_code ("") ; }
+            |   DEFAULT ':' bq_sent BREAK ';'                                 {
+                                                                                if (strlen ($3.code) > 0) {
+                                                                                    sprintf (temp, "(otherwise\n%s\n)", $3.code) ;
+                                                                                } else {
+                                                                                    sprintf (temp, "(otherwise)") ;
+                                                                                }
+                                                                                $$.code = gen_code (temp) ;
+                                                                            }
             ;
 
 elem_print:     expresion                                   { $$ = $1 ; }
@@ -338,6 +382,10 @@ t_keyword keywords [] = { // define las palabras reservadas y los
     { ">=",          GE },
     { "if",          IF },
     { "else",        ELSE },
+    { "switch",      SWITCH },
+    { "case",        CASE },
+    { "default",     DEFAULT },
+    { "break",       BREAK },
     { NULL,          0 }               // para marcar el fin de la tabla
 } ;
 

@@ -5,3 +5,4 @@ main () {
     a = a + 1;
     printf ("%d", a + 1);
 }
+//@ (main)
