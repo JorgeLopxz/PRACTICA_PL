@@ -102,11 +102,15 @@ dec_var_local:                                                  { $$.code = gen_
                                                                 $$.code = gen_code (temp) ; }
             ;
 
-integer_local:  INTEGER IDENTIF r_integer                       { add_local($2.code); // La guardamos en la tabla
-                                                                  sprintf (temp, "(setq main_%s %s)", $2.code, $3.code);
+integer_local:  INTEGER lista_integer_local                     { $$ = $2 ; }
+            ;
+
+lista_integer_local:
+                IDENTIF r_integer                               { add_local($1.code);
+                                                                  sprintf (temp, "(setq main_%s %s)", $1.code, $2.code);
                                                                   $$.code = gen_code(temp); }
-            |   INTEGER IDENTIF r_integer ',' integer_local     { add_local($2.code);
-                                                                  sprintf (temp, "(setq main_%s %s)\n%s", $2.code, $3.code, $5.code);
+            |   lista_integer_local ',' IDENTIF r_integer       { add_local($3.code);
+                                                                  sprintf (temp, "%s\n(setq main_%s %s)", $1.code, $3.code, $4.code);
                                                                   $$.code = gen_code(temp); }
             ;
 
@@ -198,15 +202,19 @@ lista_print:    elem_print                                  { sprintf (temp, "(p
                                                               $$.code = gen_code (temp) ; }
             ;
 
-integer:        INTEGER IDENTIF  r_integer                  { sprintf (temp, "(setq %s %s)", $2.code, $3.code);
+integer:        INTEGER lista_integer_global                { $$ = $2 ; }
+            ;
+
+lista_integer_global:
+                IDENTIF r_integer                           { sprintf (temp, "(setq %s %s)", $1.code, $2.code);
                                                               $$.code = gen_code(temp); }
-            |   INTEGER IDENTIF  r_integer ',' integer      { sprintf (temp, "(setq %s %s) %s", $2.code, $3.code, $5.code);
+            |   lista_integer_global ',' IDENTIF r_integer  { sprintf (temp, "%s\n(setq %s %s)", $1.code, $3.code, $4.code);
                                                               $$.code = gen_code(temp); }
             ;
           
 r_integer:                                                  { sprintf (temp, "0");
                                                               $$.code = gen_code(temp);}  // lambda  
-            |   '=' NUMBER                                  { sprintf (temp, "%s)", int_to_string($2.value));
+            |   '=' NUMBER                                  { sprintf (temp, "%s", int_to_string($2.value));
                                                               $$.code = gen_code(temp);}
             ;
 
@@ -264,6 +272,7 @@ char *mensaje ;
 {
     fprintf (stderr, "%s en la linea %d\n", mensaje, n_line) ;
     printf ( "\n") ;	// bye
+    return 0 ;
 }
 
 char *int_to_string (int n)
@@ -313,23 +322,23 @@ typedef struct s_keyword { // para las palabras reservadas de C
 } t_keyword ;
 
 t_keyword keywords [] = { // define las palabras reservadas y los
-    "main",        MAIN,           // y los token asociados
-    "int",         INTEGER,
-    "while",       WHILE,
-    "for",         FOR,
-    "inc",         INC,            
-    "dec",         DEC,            
-    "puts",        PUTS,
-    "printf",      PRINTF,
-    "&&",          AND,
-    "||",          OR,
-    "==",          EQ,
-    "!=",          NE,
-    "<=",          LE,
-    ">=",          GE,
-    "if",          IF,
-    "else",        ELSE,
-    NULL,          0               // para marcar el fin de la tabla
+    { "main",        MAIN },           // y los token asociados
+    { "int",         INTEGER },
+    { "while",       WHILE },
+    { "for",         FOR },
+    { "inc",         INC },
+    { "dec",         DEC },
+    { "puts",        PUTS },
+    { "printf",      PRINTF },
+    { "&&",          AND },
+    { "||",          OR },
+    { "==",          EQ },
+    { "!=",          NE },
+    { "<=",          LE },
+    { ">=",          GE },
+    { "if",          IF },
+    { "else",        ELSE },
+    { NULL,          0 }               // para marcar el fin de la tabla
 } ;
 
 t_keyword *search_keyword (char *symbol_name)
