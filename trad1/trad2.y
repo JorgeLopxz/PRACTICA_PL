@@ -146,7 +146,7 @@ lista_integer_local:
                 IDENTIF r_integer                               { add_local($1.code);
                                                                   sprintf (temp, "(setq main_%s %s)", $1.code, $2.code);
                                                                   $$.code = gen_code(temp); }
-            |   IDENTIF r_integer ',' lista_integer_local       { add_local($3.code);
+            |   IDENTIF r_integer ',' lista_integer_local       { add_local($1.code);
                                                                   sprintf (temp, "(setq main_%s %s) \n%s", $1.code, $2.code, $4.code);
                                                                   $$.code = gen_code(temp); }
             ;
