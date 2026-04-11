@@ -84,6 +84,25 @@ axioma:         dec_var def_func                            { if (strlen ($1.cod
                                                             }
             ;
 
+def_func:       def_main def_otras                           { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                              $$.code = gen_code (temp) ; }
+            ;
+
+def_main:       MAIN '(' ')' '{' dec_var_local bq_sent '}'      { sprintf (temp, "(defun main ()\n%s\n%s\n)", $5.code, $6.code) ;
+                                                                  $$.code = gen_code (temp) ; }
+            ;
+
+def_otras:                                                   { $$.code = gen_code ("") ; }
+            |   def_otras IDENTIF '(' ')' '{' dec_var_local bq_sent '}'  {
+                                                                if (strlen ($1.code) > 0) {
+                                                                    sprintf (temp, "%s\n(defun %s ()\n%s\n%s\n)", $1.code, $2.code, $6.code, $7.code) ;
+                                                                } else {
+                                                                    sprintf (temp, "(defun %s ()\n%s\n%s\n)", $2.code, $6.code, $7.code) ;
+                                                                }
+                                                                $$.code = gen_code (temp) ;
+                                                            }
+            ;
+
 dec_var:                                                    { $$.code = gen_code ("") ; } // lambda
             |   dec_var integer ';'                         { if (strlen ($1.code) > 0) {
                                                                 sprintf (temp, "%s\n%s", $1.code, $2.code) ;
@@ -113,10 +132,6 @@ lista_integer_local:
             |   lista_integer_local ',' IDENTIF r_integer       { add_local($3.code);
                                                                   sprintf (temp, "%s\n(setq main_%s %s)", $1.code, $3.code, $4.code);
                                                                   $$.code = gen_code(temp); }
-            ;
-
-def_func:       MAIN '(' ')' '{' dec_var_local bq_sent '}'      { sprintf (temp, "(defun main ()\n%s\n%s\n)", $5.code, $6.code) ;
-                                                                  $$.code = gen_code (temp) ; }
             ;
 
 bq_sent:                                                    { $$.code = gen_code ("") ; } //lambda
