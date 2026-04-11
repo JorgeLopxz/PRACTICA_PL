@@ -18,7 +18,7 @@ char *int_to_string (int) ;
 char *char_to_string (char) ;
 void add_local(char* nombre) ;
 int es_local(char* nombre) ;
-char* get_var_name(char* id) ;
+char *get_var_name(char* id) ;
 
 char temp [2048] ;
 
@@ -92,9 +92,9 @@ def_main:       MAIN '(' ')' '{' dec_var_local bq_sent '}'      { sprintf (temp,
                                                                   $$.code = gen_code (temp) ; }
             ;
 
-def_otras:                                                   { $$.code = gen_code ("") ; }
-            |   def_otras IDENTIF '(' ')' '{' dec_var_local bq_sent '}'  {
-                                                                if (strlen ($1.code) > 0) {
+def_otras:                                                      { $$.code = gen_code ("") ; } // lambda
+            |   def_otras IDENTIF '(' ')' '{' dec_var_local bq_sent '}'  
+                                                                { if (strlen ($1.code) > 0) {
                                                                     sprintf (temp, "%s\n(defun %s ()\n%s\n%s\n)", $1.code, $2.code, $6.code, $7.code) ;
                                                                 } else {
                                                                     sprintf (temp, "(defun %s ()\n%s\n%s\n)", $2.code, $6.code, $7.code) ;
@@ -122,6 +122,23 @@ dec_var_local:                                                  { $$.code = gen_
                                                                 $$.code = gen_code (temp) ; }
             ;
 
+integer:        INTEGER lista_integer                       { $$ = $2 ; }
+            ;
+
+lista_integer:
+                IDENTIF r_integer                           { sprintf (temp, "(setq %s %s)", $1.code, $2.code);
+                                                              $$.code = gen_code(temp); }
+            |   IDENTIF r_integer ',' lista_integer         { sprintf (temp, "(setq %s %s) \n%s", $1.code, $2.code, $4.code);
+                                                              $$.code = gen_code(temp); }
+            ;
+          
+r_integer:                                                  { sprintf (temp, "0");
+                                                              $$.code = gen_code(temp);}  // lambda  
+            |   '=' NUMBER                                  { sprintf (temp, "%s", int_to_string($2.value));
+                                                              $$.code = gen_code(temp);}
+            ;
+
+
 integer_local:  INTEGER lista_integer_local                     { $$ = $2 ; }
             ;
 
@@ -129,8 +146,8 @@ lista_integer_local:
                 IDENTIF r_integer                               { add_local($1.code);
                                                                   sprintf (temp, "(setq main_%s %s)", $1.code, $2.code);
                                                                   $$.code = gen_code(temp); }
-            |   lista_integer_local ',' IDENTIF r_integer       { add_local($3.code);
-                                                                  sprintf (temp, "%s\n(setq main_%s %s)", $1.code, $3.code, $4.code);
+            |   IDENTIF r_integer ',' lista_integer_local       { add_local($3.code);
+                                                                  sprintf (temp, "(setq main_%s %s) \n%s", $1.code, $2.code, $4.code);
                                                                   $$.code = gen_code(temp); }
             ;
 
@@ -163,13 +180,13 @@ bq_sent:                                                    { $$.code = gen_code
                                                               }
                                                               $$.code = gen_code (temp) ; 
                                                             }
-                        |   bq_sent st_switch                           { if (strlen ($1.code) > 0) {
-                                                                                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                                                                                            } else {
-                                                                                                                                sprintf (temp, "%s", $2.code) ;
-                                                                                                                            }
-                                                                                                                            $$.code = gen_code (temp) ;
-                                                                                                                        }
+            |   bq_sent st_switch                           { if (strlen ($1.code) > 0) {
+                                                              sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                              } else {
+                                                              sprintf (temp, "%s", $2.code) ;
+                                                              }
+                                                              $$.code = gen_code (temp) ;
+                                                            }
             ;
 
 sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(setf %s %s)", get_var_name($1.code), $3.code) ; 
@@ -214,39 +231,37 @@ st_if:          IF '(' expresion ')' '{' bq_sent '}'                        { sp
                                                                               $$.code = gen_code (temp) ; }
             ;
 
-st_switch:      SWITCH '(' expresion ')' '{' lista_cases opt_default '}'    {
-                                                                                if (strlen ($6.code) > 0) {
-                                                                                    sprintf (temp, "(case %s\n%s\n%s\n)", $3.code, $6.code, $7.code) ;
-                                                                                } else {
-                                                                                    sprintf (temp, "(case %s\n%s\n)", $3.code, $7.code) ;
-                                                                                }
-                                                                                $$.code = gen_code (temp) ;
+st_switch:      SWITCH '(' expresion ')' '{' lista_cases opt_default '}'    { if (strlen ($6.code) > 0) {
+                                                                                sprintf (temp, "(case %s\n%s\n%s\n)", $3.code, $6.code, $7.code) ;
+                                                                              } else {
+                                                                                sprintf (temp, "(case %s\n%s\n)", $3.code, $7.code) ;
+                                                                              }
+                                                                              $$.code = gen_code (temp) ;
                                                                             }
             ;
 
-lista_cases:    case_item                                                    { $$ = $1 ; }
-            |   lista_cases case_item                                         { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                                                $$.code = gen_code (temp) ; }
+lista_cases:    case_item                                                   { $$ = $1 ; }
+            |   lista_cases case_item                                       { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                              $$.code = gen_code (temp) ; }
             ;
 
-case_item:      CASE NUMBER ':' bq_sent BREAK ';'                            {
-                                                                                if (strlen ($4.code) > 0) {
-                                                                                    sprintf (temp, "(%d\n%s\n)", $2.value, $4.code) ;
-                                                                                } else {
-                                                                                    sprintf (temp, "(%d)", $2.value) ;
-                                                                                }
-                                                                                $$.code = gen_code (temp) ;
+case_item:      CASE NUMBER ':' bq_sent BREAK ';'                           {
+                                                                              if (strlen ($4.code) > 0) {
+                                                                                sprintf (temp, "(%d\n%s\n)", $2.value, $4.code) ;
+                                                                              } else {
+                                                                                sprintf (temp, "(%d)", $2.value) ;
+                                                                              }
+                                                                              $$.code = gen_code (temp) ;
                                                                             }
             ;
 
 opt_default:                                                                { $$.code = gen_code ("") ; }
-            |   DEFAULT ':' bq_sent BREAK ';'                                 {
-                                                                                if (strlen ($3.code) > 0) {
-                                                                                    sprintf (temp, "(otherwise\n%s\n)", $3.code) ;
-                                                                                } else {
-                                                                                    sprintf (temp, "(otherwise)") ;
-                                                                                }
-                                                                                $$.code = gen_code (temp) ;
+            |   DEFAULT ':' bq_sent BREAK ';'                               { if (strlen ($3.code) > 0) {
+                                                                                sprintf (temp, "(otherwise\n%s\n)", $3.code) ;
+                                                                              } else {
+                                                                                sprintf (temp, "(otherwise)") ;
+                                                                              }
+                                                                              $$.code = gen_code (temp) ;
                                                                             }
             ;
 
@@ -259,22 +274,6 @@ lista_print:    elem_print                                  { sprintf (temp, "(p
                                                               $$.code = gen_code (temp) ; }
             |   lista_print ',' elem_print                  { sprintf (temp, "%s\n(princ %s)", $1.code, $3.code) ;
                                                               $$.code = gen_code (temp) ; }
-            ;
-
-integer:        INTEGER lista_integer_global                { $$ = $2 ; }
-            ;
-
-lista_integer_global:
-                IDENTIF r_integer                           { sprintf (temp, "(setq %s %s)", $1.code, $2.code);
-                                                              $$.code = gen_code(temp); }
-            |   lista_integer_global ',' IDENTIF r_integer  { sprintf (temp, "%s\n(setq %s %s)", $1.code, $3.code, $4.code);
-                                                              $$.code = gen_code(temp); }
-            ;
-          
-r_integer:                                                  { sprintf (temp, "0");
-                                                              $$.code = gen_code(temp);}  // lambda  
-            |   '=' NUMBER                                  { sprintf (temp, "%s", int_to_string($2.value));
-                                                              $$.code = gen_code(temp);}
             ;
 
 expresion:      termino                                     { $$ = $1 ; }
