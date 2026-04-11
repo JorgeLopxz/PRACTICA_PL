@@ -84,23 +84,23 @@ axioma:         dec_var def_func                            { if (strlen ($1.cod
                                                             }
             ;
 
-def_func:       def_main def_otras                           { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+def_func:       def_otras def_main                          { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
                                                               $$.code = gen_code (temp) ; }
             ;
 
-def_main:       MAIN '(' ')' '{' dec_var_local bq_sent '}'      { sprintf (temp, "(defun main ()\n%s\n%s\n)", $5.code, $6.code) ;
+def_main:       MAIN '(' ')' '{' dec_var_local bq_sent '}'      { sprintf (temp, "(defun main ()\n%s\n%s)", $5.code, $6.code) ;
                                                                   $$.code = gen_code (temp) ; }
             ;
 
 def_otras:                                                      { $$.code = gen_code ("") ; } // lambda
-            |   def_otras IDENTIF '(' ')' '{' dec_var_local bq_sent '}'  
-                                                                { if (strlen ($1.code) > 0) {
-                                                                    sprintf (temp, "%s\n(defun %s ()\n%s\n%s\n)", $1.code, $2.code, $6.code, $7.code) ;
-                                                                } else {
-                                                                    sprintf (temp, "(defun %s ()\n%s\n%s\n)", $2.code, $6.code, $7.code) ;
+            |   IDENTIF '(' ')' '{' dec_var_local bq_sent '}' def_otras 
+                                                                { if (strlen ($8.code) > 0) {
+                                                                    sprintf (temp, "(defun %s ()\n%s\n%s)\n%s", $1.code, $5.code, $6.code, $8.code) ;
+                                                                  } else {
+                                                                    sprintf (temp, "(defun %s ()\n%s\n%s)", $1.code, $5.code, $6.code) ;
+                                                                  }
+                                                                  $$.code = gen_code (temp) ;
                                                                 }
-                                                                $$.code = gen_code (temp) ;
-                                                            }
             ;
 
 dec_var:                                                    { $$.code = gen_code ("") ; } // lambda
@@ -116,10 +116,11 @@ dec_var:                                                    { $$.code = gen_code
 dec_var_local:                                                  { $$.code = gen_code ("") ; } // lambda
             |   dec_var_local integer_local ';'                 { if (strlen ($1.code) > 0) {
                                                                     sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                                } else {
+                                                                  } else {
                                                                     sprintf (temp, "%s", $2.code) ;
+                                                                  }
+                                                                  $$.code = gen_code (temp) ; 
                                                                 }
-                                                                $$.code = gen_code (temp) ; }
             ;
 
 integer:        INTEGER lista_integer                       { $$ = $2 ; }
@@ -330,7 +331,6 @@ char *mensaje ;
 {
     fprintf (stderr, "%s en la linea %d\n", mensaje, n_line) ;
     printf ( "\n") ;	// bye
-    return 0 ;
 }
 
 char *int_to_string (int n)
@@ -380,27 +380,27 @@ typedef struct s_keyword { // para las palabras reservadas de C
 } t_keyword ;
 
 t_keyword keywords [] = { // define las palabras reservadas y los
-    { "main",        MAIN },           // y los token asociados
-    { "int",         INTEGER },
-    { "while",       WHILE },
-    { "for",         FOR },
-    { "inc",         INC },
-    { "dec",         DEC },
-    { "puts",        PUTS },
-    { "printf",      PRINTF },
-    { "&&",          AND },
-    { "||",          OR },
-    { "==",          EQ },
-    { "!=",          NE },
-    { "<=",          LE },
-    { ">=",          GE },
-    { "if",          IF },
-    { "else",        ELSE },
-    { "switch",      SWITCH },
-    { "case",        CASE },
-    { "default",     DEFAULT },
-    { "break",       BREAK },
-    { NULL,          0 }               // para marcar el fin de la tabla
+    "main",        MAIN ,           // y los token asociados
+    "int",         INTEGER ,
+    "while",       WHILE ,
+    "for",         FOR ,
+    "inc",         INC ,
+    "dec",         DEC ,
+    "puts",        PUTS ,
+    "printf",      PRINTF ,
+    "&&",          AND ,
+    "||",          OR ,
+    "==",          EQ ,
+    "!=",          NE ,
+    "<=",          LE ,
+    ">=",          GE ,
+    "if",          IF ,
+    "else",        ELSE ,
+    "switch",      SWITCH ,
+    "case",        CASE ,
+    "default",     DEFAULT ,
+    "break",       BREAK ,
+    NULL,          0              // para marcar el fin de la tabla
 } ;
 
 t_keyword *search_keyword (char *symbol_name)

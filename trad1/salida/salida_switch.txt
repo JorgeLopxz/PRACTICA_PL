@@ -1,0 +1,18 @@
+ (main)
+(setq a 0)
+(defun main ()
+
+(setf a 2)
+(case a
+(1
+(print "uno")
+)
+(2
+(print "dos")
+)
+(otherwise
+(print "otro")
+)
+)
+)
+

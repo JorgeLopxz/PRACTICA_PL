@@ -1,20 +1,26 @@
-int a, b;
+int a;
+int b;
 
-main () {
+main()
+{
     a = 1;
-    
+
     // Prueba de IF sin else
-    if (a == 1) {
+    if (a == 1)
+    {
         puts("A es igual a 1");
     }
-    
+
     // Prueba de IF con ELSE
-    if (a == 0) {
+    if (a == 0)
+    {
         b = 123;
-    } else {
+    }
+    else
+    {
         b = 456;
     }
-    
+
     printf("El valor de b es: ", b);
 }
 //@ (main)
