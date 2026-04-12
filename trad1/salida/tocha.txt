@@ -1,0 +1,58 @@
+(setq global_a 10) 
+(setq global_b 0) 
+(setq global_c 0)
+(setq vector_global (make-array 5))
+
+(defun es_par_o_impar (v)
+(setq es_par_o_impar_local_ep 0)
+(if (= (mod v 2) 0)
+(progn
+(print " El numero es par")
+(setf es_par_o_impar_local_ep 1))
+(progn
+(print " El numero es impar")
+(setf es_par_o_impar_local_ep 0)))
+(return-from es_par_o_impar es_par_o_impar_local_ep))
+
+(defun procesar_vector (multiplicador)
+(setq procesar_vector_local_i 0) 
+(setq procesar_vector_temp 0)
+(setf procesar_vector_local_i 0)
+(loop while (< procesar_vector_local_i 5) do
+(setf procesar_vector_temp (aref vector_global procesar_vector_local_i))
+(setf (aref vector_global procesar_vector_local_i) (* procesar_vector_temp multiplicador))
+(setf procesar_vector_local_i (+ procesar_vector_local_i 1)))
+(return-from procesar_vector 1))
+
+(defun main ()
+(setq main_i 0) 
+(setq main_j 0) 
+(setq main_k 2) 
+(setq main_test_val 4) 
+(setq main_res 0)
+(setq main_vector_local (make-array 3))
+(print "--- INICIANDO PRUEBA DE LAS 12 ESPECIFICACIONES ---")
+(loop while (< main_i 5) do
+(setf (aref vector_global main_i) (+ main_i 1))
+(setf main_i (+ main_i 1)))
+(princ (aref vector_global 3))
+(print "")
+(setf main_res (procesar_vector 10))
+(princ (aref vector_global 3))
+(print "")
+(case main_k
+(1
+(print "Ejecutando Caso 1 del switch"))
+(2
+(print "Ejecutando Caso 2 del switch (CORRECTO)"))
+(otherwise
+(print "Ejecutando Caso default del switch")))
+(if (and (> global_a 5) (/= global_b 10))
+(progn
+(print "Condicion relacional compleja evaluada como verdadera")))
+(setf (aref main_vector_local 0) main_test_val)
+(princ (aref main_vector_local 0))
+(setf main_res (es_par_o_impar (aref main_vector_local 0)))
+(print "--- FIN DE LAS PRUEBAS ---")
+(return-from main 0))
+ (main)

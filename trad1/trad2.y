@@ -82,11 +82,11 @@ typedef struct s_attr {
 axioma:         dec_var def_func                                    { if (strlen ($1.code) > 0) {
                                                                         printf ("%s\n", $1.code) ;
                                                                       }
-                                                                      printf ("%s\n", $2.code) ;
+                                                                      printf ("\n%s\n", $2.code) ;
                                                                     }
             ;
 
-def_func:       def_otras def_main                                  { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+def_func:       def_otras def_main                                  { sprintf (temp, "%s%s", $1.code, $2.code) ;
                                                                       $$.code = gen_code (temp) ; }
             ;
 
@@ -268,17 +268,17 @@ st_for:         FOR '(' sentencia ';' expresion ';' op_inc_dec ')' '{' bq_sent '
                                 }
             ;
 
-st_if:          IF '(' expresion ')' '{' bq_sent '}'                        { sprintf (temp, "(if %s\n(progn\n%s\n)\n)", $3.code, $6.code) ;
+st_if:          IF '(' expresion ')' '{' bq_sent '}'                        { sprintf (temp, "(if %s\n(progn\n%s))", $3.code, $6.code) ;
                                                                               $$.code = gen_code (temp) ; }
 
-            |   IF '(' expresion ')' '{' bq_sent '}' ELSE '{' bq_sent '}'   { sprintf (temp, "(if %s\n(progn\n%s\n)\n(progn\n%s\n)\n)", $3.code,   $6.code, $10.code) ;
+            |   IF '(' expresion ')' '{' bq_sent '}' ELSE '{' bq_sent '}'   { sprintf (temp, "(if %s\n(progn\n%s)\n(progn\n%s))", $3.code,   $6.code, $10.code) ;
                                                                               $$.code = gen_code (temp) ; }
             ;
 
 st_switch:      SWITCH '(' expresion ')' '{' lista_cases opt_default '}'    { if (strlen ($6.code) > 0) {
-                                                                                sprintf (temp, "(case %s\n%s\n%s\n)", $3.code, $6.code, $7.code) ;
+                                                                                sprintf (temp, "(case %s\n%s\n%s)", $3.code, $6.code, $7.code) ;
                                                                               } else {
-                                                                                sprintf (temp, "(case %s\n%s\n)", $3.code, $7.code) ;
+                                                                                sprintf (temp, "(case %s\n%s)", $3.code, $7.code) ;
                                                                               }
                                                                               $$.code = gen_code (temp) ;
                                                                             }
@@ -291,7 +291,7 @@ lista_cases:    case_item                                                   { $$
 
 case_item:      CASE NUMBER ':' bq_sent BREAK ';'                           {
                                                                               if (strlen ($4.code) > 0) {
-                                                                                sprintf (temp, "(%d\n%s\n)", $2.value, $4.code) ;
+                                                                                sprintf (temp, "(%d\n%s)", $2.value, $4.code) ;
                                                                               } else {
                                                                                 sprintf (temp, "(%d)", $2.value) ;
                                                                               }
@@ -301,7 +301,7 @@ case_item:      CASE NUMBER ':' bq_sent BREAK ';'                           {
 
 opt_default:                                                                { $$.code = gen_code ("") ; }
             |   DEFAULT ':' bq_sent BREAK ';'                               { if (strlen ($3.code) > 0) {
-                                                                                sprintf (temp, "(otherwise\n%s\n)", $3.code) ;
+                                                                                sprintf (temp, "(otherwise\n%s)", $3.code) ;
                                                                               } else {
                                                                                 sprintf (temp, "(otherwise)") ;
                                                                               }
