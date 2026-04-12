@@ -1,0 +1,6 @@
+
+"--- Iniciando pruebas de funciones ---" 25
+"" 15
+"" 100
+"" 16
+"" 

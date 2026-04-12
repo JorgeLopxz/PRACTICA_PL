@@ -1,0 +1,22 @@
+
+"=== INICIO DE PRUEBAS ===" 
+"1. Asignaciones y Aritmetica" 200
+"" 25
+"" 1
+"" 
+"" 
+"2. Condicionales (IF/ELSE) y Op. Logicos" 
+"IF 1: Correcto (AND)" 
+"IF 2: Correcto (OR y Desigualdad)" 
+"IF 3: Correcto (NOT unario)" 
+"" 
+"3. Bucle WHILE (Cuenta atras 5 a 1)" 54321
+"" 
+"" 
+"4. Bucle FOR con INC y condicional anidado" 
+"Es par" 
+"Es impar" 
+"Es par" 
+"Es impar" 
+"Es par" 
+"=== FIN DE PRUEBAS ===" 
