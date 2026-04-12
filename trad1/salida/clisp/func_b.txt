@@ -1,0 +1,6 @@
+
+"--- Iniciando pruebas de funciones (Solo paso de parametros) ---" 20
+"" 300
+"" 15
+"" 15
+"" 

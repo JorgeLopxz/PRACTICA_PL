@@ -1,0 +1,9 @@
+(setq i 0)
+
+(defun main ()
+
+(setf i 0)
+(loop while (< i 5) do
+(princ i)
+(setf i (+ i 1))))
+ (main)

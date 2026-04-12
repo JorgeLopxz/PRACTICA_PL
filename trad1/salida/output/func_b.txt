@@ -1,0 +1,28 @@
+(setq global_res 0)
+(defun saluda ()
+
+(print "--- Iniciando pruebas de funciones (Solo paso de parametros) ---"))
+
+(defun imprime_doble (x)
+
+(princ (* x 2))
+(print ""))
+
+(defun suma_y_guarda (a b)
+(setq suma_y_guarda_local_sum 0)
+(setf suma_y_guarda_local_sum (+ a b))
+(setf global_res suma_y_guarda_local_sum)
+(princ suma_y_guarda_local_sum)
+(print ""))
+
+
+(defun main ()
+(setq main_n1 10)
+(setq main_n2 5)
+(saluda)
+(imprime_doble main_n1)
+(imprime_doble (+ 100 50))
+(suma_y_guarda main_n1 main_n2)
+(princ global_res)
+(print ""))
+ (main)
