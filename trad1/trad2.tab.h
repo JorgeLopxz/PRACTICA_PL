@@ -77,7 +77,8 @@ extern int yydebug;
     CASE = 278,                    /* CASE  */
     DEFAULT = 279,                 /* DEFAULT  */
     BREAK = 280,                   /* BREAK  */
-    UNARY_SIGN = 281               /* UNARY_SIGN  */
+    RETURN = 281,                  /* RETURN  */
+    UNARY_SIGN = 282               /* UNARY_SIGN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

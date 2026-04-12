@@ -63,6 +63,7 @@ typedef struct s_attr {
 %token INC           // macro para incremento
 %token DEC           // macro para decremento
 %token SWITCH CASE DEFAULT BREAK
+%token RETURN
 
 
 
@@ -93,14 +94,23 @@ def_main:       MAIN '(' ')' '{' dec_var_local bq_sent '}'      { sprintf (temp,
             ;
 
 def_otras:                                                      { $$.code = gen_code ("") ; } // lambda
-            |   IDENTIF '(' ')' '{' dec_var_local bq_sent '}' def_otras 
-                                                                { if (strlen ($8.code) > 0) {
-                                                                    sprintf (temp, "(defun %s ()\n%s\n%s)\n%s", $1.code, $5.code, $6.code, $8.code) ;
+            |   IDENTIF '(' lista_param_def ')' '{' dec_var_local bq_sent '}' def_otras 
+                                                                { if (strlen ($9.code) > 0) {
+                                                                    sprintf (temp, "(defun %s (%s)\n%s\n%s)\n%s", $1.code, $3.code, $6.code, $7.code, $9.code) ;
                                                                   } else {
-                                                                    sprintf (temp, "(defun %s ()\n%s\n%s)", $1.code, $5.code, $6.code) ;
+                                                                    sprintf (temp, "(defun %s (%s)\n%s\n%s)", $1.code, $3.code, $6.code, $7.code) ;
                                                                   }
                                                                   $$.code = gen_code (temp) ;
                                                                 }
+            ;
+
+lista_param_def:                                                    { $$.code = gen_code ("") ; } // lambda
+            |   param_def_nonempty                                  { $$ = $1 ; }
+            ;
+
+param_def_nonempty:     INTEGER IDENTIF                             { $$.code = gen_code ($2.code) ; }
+            |           INTEGER IDENTIF ',' param_def_nonempty      { sprintf (temp, "%s %s", $2.code, $4.code) ; 
+                                                                      $$.code = gen_code (temp) ; }
             ;
 
 dec_var:                                                    { $$.code = gen_code ("") ; } // lambda
@@ -195,6 +205,15 @@ sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(s
             |   PUTS '(' STRING ')'                         { sprintf (temp, "(print \"%s\")", $3.code) ;
                                                               $$.code = gen_code (temp) ; }
             |   PRINTF '(' STRING ',' lista_print ')'       { $$ = $5 ; }
+            |   IDENTIF '(' lista_arg ')'                   { if (strlen ($3.code) > 0) {
+                                                                sprintf (temp, "(%s %s)", $1.code, $3.code) ;
+                                                              } else {
+                                                                sprintf (temp, "(%s)", $1.code) ;
+                                                              }
+                                                              $$.code = gen_code (temp) ; 
+                                                            }
+            /* |   RETURN expresion                            { sprintf (temp, "(return-from %s %s)", current_func, $2.code) ;
+                                                              $$.code = gen_code (temp) ; } */
             ;
         
 op_inc_dec:     INC '(' IDENTIF ')'         { sprintf (temp, "(setf %s (+ %s 1))", get_var_name($3.code), get_var_name($3.code)) ;
@@ -273,8 +292,17 @@ elem_print:     expresion                                   { $$ = $1 ; }
 
 lista_print:    elem_print                                  { sprintf (temp, "(princ %s)", $1.code) ;
                                                               $$.code = gen_code (temp) ; }
-            |   lista_print ',' elem_print                  { sprintf (temp, "%s\n(princ %s)", $1.code, $3.code) ;
+            |   elem_print ',' lista_print                  { sprintf (temp, "(princ %s)\n%s", $1.code, $3.code) ;
                                                               $$.code = gen_code (temp) ; }
+            ;
+
+lista_arg:                                              { $$.code = gen_code ("") ; } // lambda
+            |   arg_nonempty                            { $$ = $1 ; }
+            ;
+
+arg_nonempty:   expresion                               { $$ = $1 ; }
+            |   expresion ',' arg_nonempty              { sprintf (temp, "%s %s", $1.code, $3.code) ;
+                                                          $$.code = gen_code (temp) ; }
             ;
 
 expresion:      termino                                     { $$ = $1 ; }
@@ -319,6 +347,13 @@ operando:       IDENTIF                                     { sprintf (temp, "%s
             |   NUMBER                                      { sprintf (temp, "%d", $1.value) ;
                                                               $$.code = gen_code (temp) ; }
             |   '(' expresion ')'                           { $$ = $2 ; }
+            |   IDENTIF '(' lista_arg ')'                   { if (strlen ($3.code) > 0) {
+                                                                sprintf (temp, "(%s %s)", $1.code, $3.code) ;
+                                                              } else {
+                                                                sprintf (temp, "(%s)", $1.code) ;
+                                                              }
+                                                              $$.code = gen_code (temp) ; 
+                                                            }
             ;
 
 
@@ -400,6 +435,7 @@ t_keyword keywords [] = { // define las palabras reservadas y los
     "case",        CASE ,
     "default",     DEFAULT ,
     "break",       BREAK ,
+    "return",       RETURN,
     NULL,          0              // para marcar el fin de la tabla
 } ;
 
