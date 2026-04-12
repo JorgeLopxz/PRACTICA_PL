@@ -17,7 +17,8 @@ cuadrado(int x)
 suma(int a, int b)
 {
     // Declaramos una local para ver que no colisiona con los parametros
-    int res_local = a + b;
+    int res_local;
+    res_local = a + b;
     return res_local;
 }
 

@@ -19,8 +19,10 @@ char *char_to_string (char) ;
 void add_local(char* nombre) ;
 int es_local(char* nombre) ;
 char *get_var_name(char* id) ;
+void set_current_function(char* nombre) ;
 
 char temp [2048] ;
+char current_function [256] = "" ;
 
 // Abstract Syntax Tree (AST) Node Structure
 
@@ -66,7 +68,6 @@ typedef struct s_attr {
 %token RETURN
 
 
-
 %right '='                    // es la ultima operacion que se debe realizar
 %left OR
 %left AND
@@ -89,17 +90,14 @@ def_func:       def_otras def_main                          { sprintf (temp, "%s
                                                               $$.code = gen_code (temp) ; }
             ;
 
-def_main:       MAIN '(' ')' '{' dec_var_local bq_sent '}'      { sprintf (temp, "(defun main ()\n%s\n%s)", $5.code, $6.code) ;
+def_main:       MAIN '(' ')' { set_current_function ("main") ; } '{' dec_var_local bq_sent '}'      
+                                                                { sprintf (temp, "(defun main ()\n%s\n%s)", $6.code, $7.code) ;
                                                                   $$.code = gen_code (temp) ; }
             ;
 
 def_otras:                                                      { $$.code = gen_code ("") ; } // lambda
-            |   IDENTIF '(' lista_param_def ')' '{' dec_var_local bq_sent '}' def_otras 
-                                                                { if (strlen ($9.code) > 0) {
-                                                                    sprintf (temp, "(defun %s (%s)\n%s\n%s)\n%s", $1.code, $3.code, $6.code, $7.code, $9.code) ;
-                                                                  } else {
-                                                                    sprintf (temp, "(defun %s (%s)\n%s\n%s)", $1.code, $3.code, $6.code, $7.code) ;
-                                                                  }
+            |   IDENTIF { set_current_function ($1.code) ; } '(' lista_param_def ')' '{' dec_var_local bq_sent '}' def_otras 
+                                                                { sprintf (temp, "(defun %s (%s)\n%s\n%s)\n\n%s", $1.code, $4.code, $7.code, $8.code, $10.code) ;
                                                                   $$.code = gen_code (temp) ;
                                                                 }
             ;
@@ -155,10 +153,10 @@ integer_local:  INTEGER lista_integer_local                     { $$ = $2 ; }
 
 lista_integer_local:
                 IDENTIF r_integer                               { add_local($1.code);
-                                                                  sprintf (temp, "(setq main_%s %s)", $1.code, $2.code);
+                                                                  sprintf (temp, "(setq %s_%s %s)", current_function, $1.code, $2.code);
                                                                   $$.code = gen_code(temp); }
             |   IDENTIF r_integer ',' lista_integer_local       { add_local($1.code);
-                                                                  sprintf (temp, "(setq main_%s %s) \n%s", $1.code, $2.code, $4.code);
+                                                                  sprintf (temp, "(setq %s_%s %s) \n%s", current_function, $1.code, $2.code, $4.code);
                                                                   $$.code = gen_code(temp); }
             ;
 
@@ -212,8 +210,8 @@ sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(s
                                                               }
                                                               $$.code = gen_code (temp) ; 
                                                             }
-            /* |   RETURN expresion                            { sprintf (temp, "(return-from %s %s)", current_func, $2.code) ;
-                                                              $$.code = gen_code (temp) ; } */
+            |   RETURN expresion                            { sprintf (temp, "(return-from %s %s)", current_function, $2.code) ;
+                                                              $$.code = gen_code (temp) ; }
             ;
         
 op_inc_dec:     INC '(' IDENTIF ')'         { sprintf (temp, "(setf %s (+ %s 1))", get_var_name($3.code), get_var_name($3.code)) ;
@@ -435,7 +433,7 @@ t_keyword keywords [] = { // define las palabras reservadas y los
     "case",        CASE ,
     "default",     DEFAULT ,
     "break",       BREAK ,
-    "return",       RETURN,
+    "return",      RETURN,
     NULL,          0              // para marcar el fin de la tabla
 } ;
 
@@ -478,29 +476,36 @@ char *gen_code (char *name)     // copia el argumento a un
 /***************************************************************************/
 /******************* Seccion del Variables Locales *************************/
 /***************************************************************************/
-char tabla_locales[100][256]; // Tabla para guardar hasta 100 variables locales
+char tabla_locales[100][512]; // Tabla para guardar hasta 100 variables locales
 int num_locales = 0;
 
 void add_local(char* nombre) {
-    strcpy(tabla_locales[num_locales++], nombre);
+    sprintf(tabla_locales[num_locales++], "%s_%s", current_function, nombre);
 }
 
 int es_local(char* nombre) {
+    char nombre_acotado[512];
+    sprintf(nombre_acotado, "%s_%s", current_function, nombre);
     for(int i = 0; i < num_locales; i++) {
-        if(strcmp(tabla_locales[i], nombre) == 0) return 1;
+        if(strcmp(tabla_locales[i], nombre_acotado) == 0) return 1;
     }
     return 0; // No está en la tabla, por lo que es global
 }
 
 char* get_var_name(char* id) {
     if (es_local(id)) {
-        char temp_name[256];
-        sprintf(temp_name, "main_%s", id); // Le añade el prefijo
+        char temp_name[512];
+        sprintf(temp_name, "%s_%s", current_function, id); // Le añade el prefijo de la función actual
         return gen_code(temp_name);
     }
     return id; // Si es global, devuelve el nombre tal cual
 }
 // ------------------------------------
+
+void set_current_function(char* nombre) {
+  strncpy(current_function, nombre, sizeof(current_function) - 1);
+  current_function[sizeof(current_function) - 1] = '\0';
+}
 
 
 int yylex ()

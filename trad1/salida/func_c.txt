@@ -1,0 +1,43 @@
+(setq global_res 0)
+(defun saluda ()
+
+(print "--- Iniciando pruebas de funciones ---"))
+
+(defun cuadrado (x)
+
+(return-from cuadrado (* x x)))
+
+(defun suma (a b)
+(setq suma_res_local 0)
+(setf suma_res_local (+ a b))
+(return-from suma suma_res_local))
+
+(defun maximo (a b)
+
+(if (> a b)
+(progn
+(return-from maximo a)
+)
+(progn
+(return-from maximo b)
+)
+))
+
+
+(defun main ()
+(setq main_n1 5)
+(setq main_n2 10)
+(setq main_c 0)
+(saluda)
+(setf main_c (cuadrado main_n1))
+(princ main_c)
+(print "")
+(setf main_c (suma main_n1 main_n2))
+(princ main_c)
+(print "")
+(setf global_res (maximo 100 25))
+(princ global_res)
+(print "")
+(princ (cuadrado 4))
+(print ""))
+ (main)
