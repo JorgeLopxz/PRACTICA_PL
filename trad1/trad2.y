@@ -224,6 +224,8 @@ bq_sent:                                                    { $$.code = gen_code
 
 sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(setf %s %s)", get_var_name($1.code), $3.code) ; 
                                                               $$.code = gen_code (temp) ; }
+            |   IDENTIF '[' expresion ']' '=' expresion     { sprintf (temp, "(setf (aref %s %s) %s)", get_var_name($1.code), $3.code, $6.code) ;
+                                                              $$.code = gen_code (temp) ; }
             |   PUTS '(' STRING ')'                         { sprintf (temp, "(print \"%s\")", $3.code) ;
                                                               $$.code = gen_code (temp) ; }
             |   PRINTF '(' STRING ',' lista_print ')'       { $$ = $5 ; }

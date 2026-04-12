@@ -82,36 +82,6 @@ extern int yydebug;
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define NUMBER 258
-#define IDENTIF 259
-#define INTEGER 260
-#define STRING 261
-#define MAIN 262
-#define WHILE 263
-#define PUTS 264
-#define PRINTF 265
-#define AND 266
-#define OR 267
-#define EQ 268
-#define NE 269
-#define LE 270
-#define GE 271
-#define IF 272
-#define ELSE 273
-#define FOR 274
-#define INC 275
-#define DEC 276
-#define SWITCH 277
-#define CASE 278
-#define DEFAULT 279
-#define BREAK 280
-#define RETURN 281
-#define UNARY_SIGN 282
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
