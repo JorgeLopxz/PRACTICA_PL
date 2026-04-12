@@ -1,0 +1,7 @@
+int myvector[32];
+int a;
+main(){
+int v[5];
+a = 3;
+printf("%d", a);
+}
