@@ -1,0 +1,7 @@
+(setq g (make-array 3))
+
+(defun main ()
+(setq main_v (make-array 2))
+(princ (aref g 1))
+(princ (aref main_v 0)))
+ (main)

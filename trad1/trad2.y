@@ -119,6 +119,13 @@ dec_var:                                                    { $$.code = gen_code
                                                               }
                                                               $$.code = gen_code (temp) ;
                                                             }
+            |   dec_var vector_decl ';'                     { if (strlen ($1.code) > 0) {
+                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                              } else {
+                                                                sprintf (temp, "%s", $2.code) ;
+                                                              }
+                                                              $$.code = gen_code (temp) ;
+                                                            }
             ;
 
 dec_var_local:                                                  { $$.code = gen_code ("") ; } // lambda
@@ -128,6 +135,13 @@ dec_var_local:                                                  { $$.code = gen_
                                                                     sprintf (temp, "%s", $2.code) ;
                                                                   }
                                                                   $$.code = gen_code (temp) ; 
+                                                                }
+            |   dec_var_local vector_decl_local ';'             { if (strlen ($1.code) > 0) {
+                                                                    sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                  } else {
+                                                                    sprintf (temp, "%s", $2.code) ;
+                                                                  }
+                                                                  $$.code = gen_code (temp) ;
                                                                 }
             ;
 
@@ -158,6 +172,16 @@ lista_integer_local:
             |   IDENTIF r_integer ',' lista_integer_local       { add_local($1.code);
                                                                   sprintf (temp, "(setq %s_%s %s) \n%s", current_function, $1.code, $2.code, $4.code);
                                                                   $$.code = gen_code(temp); }
+            ;
+
+vector_decl:     INTEGER IDENTIF '[' NUMBER ']'                { sprintf (temp, "(setq %s (make-array %d))", $2.code, $4.value) ;
+                                                                  $$.code = gen_code (temp) ; }
+            ;
+
+vector_decl_local:
+                INTEGER IDENTIF '[' NUMBER ']'                 { add_local($2.code) ;
+                                                                  sprintf (temp, "(setq main_%s (make-array %d))", $2.code, $4.value) ;
+                                                                  $$.code = gen_code (temp) ; }
             ;
 
 bq_sent:                                                    { $$.code = gen_code ("") ; } //lambda
@@ -345,6 +369,8 @@ operando:       IDENTIF                                     { sprintf (temp, "%s
             |   NUMBER                                      { sprintf (temp, "%d", $1.value) ;
                                                               $$.code = gen_code (temp) ; }
             |   '(' expresion ')'                           { $$ = $2 ; }
+            |   IDENTIF '[' expresion ']'                   { sprintf (temp, "(aref %s %s)", get_var_name($1.code), $3.code) ;
+                                                              $$.code = gen_code (temp) ; }
             |   IDENTIF '(' lista_arg ')'                   { if (strlen ($3.code) > 0) {
                                                                 sprintf (temp, "(%s %s)", $1.code, $3.code) ;
                                                               } else {
