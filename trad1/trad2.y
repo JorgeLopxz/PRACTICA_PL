@@ -371,6 +371,8 @@ operando:       IDENTIF                                     { sprintf (temp, "%s
             |   NUMBER                                      { sprintf (temp, "%d", $1.value) ;
                                                               $$.code = gen_code (temp) ; }
             |   '(' expresion ')'                           { $$ = $2 ; }
+            |   IDENTIF '[' expresion ']'                   { sprintf (temp, "(aref %s %s)", get_var_name($1.code), $3.code) ;
+                                                              $$.code = gen_code (temp) ; }
             |   IDENTIF '(' lista_arg ')'                   { if (strlen ($3.code) > 0) {
                                                                 sprintf (temp, "(%s %s)", $1.code, $3.code) ;
                                                               } else {
