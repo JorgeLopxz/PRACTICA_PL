@@ -1,0 +1,44 @@
+(defun square (v)
+
+(return-from square (* v v)))
+
+(defun fact (n)
+(setq fact_f 0)
+(if (= n 1)
+(progn
+(setf fact_f 1)
+)
+(progn
+(setf fact_f (* n (fact (- n 1))))
+)
+)
+(return-from fact fact_f))
+
+(defun is_even (v)
+(setq is_even_ep 0)
+(princ v)
+(if (= (mod v 2) 0)
+(progn
+(print " is even")
+(setf is_even_ep 1)
+)
+(progn
+(print " is odd")
+(setf is_even_ep 0)
+)
+)
+(return-from is_even is_even_ep))
+
+
+(defun main ()
+
+(princ (square 7))
+(print " ")
+(princ (fact 7))
+(print " ")
+(princ (is_even 7))
+(print " ")
+(princ (is_even 8))
+(print " ")
+(is_even 8))
+ (main)
