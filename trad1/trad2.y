@@ -79,15 +79,15 @@ typedef struct s_attr {
 
 %%                            // Seccion 3 Gramatica - Semantico
 
-axioma:         dec_var def_func                            { if (strlen ($1.code) > 0) {
-                                                                printf ("%s\n", $1.code) ;
-                                                              }
-                                                              printf ("%s\n", $2.code) ;
-                                                            }
+axioma:         dec_var def_func                                    { if (strlen ($1.code) > 0) {
+                                                                        printf ("%s\n", $1.code) ;
+                                                                      }
+                                                                      printf ("%s\n", $2.code) ;
+                                                                    }
             ;
 
-def_func:       def_otras def_main                          { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                              $$.code = gen_code (temp) ; }
+def_func:       def_otras def_main                                  { sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                      $$.code = gen_code (temp) ; }
             ;
 
 def_main:       MAIN '(' ')' { set_current_function ("main") ; } '{' dec_var_local bq_sent '}'      
@@ -111,54 +111,54 @@ param_def_nonempty:     INTEGER IDENTIF                             { $$.code = 
                                                                       $$.code = gen_code (temp) ; }
             ;
 
-dec_var:                                                    { $$.code = gen_code ("") ; } // lambda
-            |   dec_var integer ';'                         { if (strlen ($1.code) > 0) {
-                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                              } else {
-                                                                sprintf (temp, "%s", $2.code) ;
-                                                              }
-                                                              $$.code = gen_code (temp) ;
-                                                            }
-            |   dec_var vector_decl ';'                     { if (strlen ($1.code) > 0) {
-                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                              } else {
-                                                                sprintf (temp, "%s", $2.code) ;
-                                                              }
-                                                              $$.code = gen_code (temp) ;
-                                                            }
+dec_var:                                                            { $$.code = gen_code ("") ; } // lambda
+            |   dec_var integer ';'                                 { if (strlen ($1.code) > 0) {
+                                                                        sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                      } else {
+                                                                        sprintf (temp, "%s", $2.code) ;
+                                                                      }
+                                                                      $$.code = gen_code (temp) ;
+                                                                    }
+            |   dec_var vector_dec ';'                              { if (strlen ($1.code) > 0) {
+                                                                        sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                      } else {
+                                                                        sprintf (temp, "%s", $2.code) ;
+                                                                      }
+                                                                      $$.code = gen_code (temp) ;
+                                                                    }
             ;
 
-dec_var_local:                                                  { $$.code = gen_code ("") ; } // lambda
-            |   dec_var_local integer_local ';'                 { if (strlen ($1.code) > 0) {
-                                                                    sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                                  } else {
-                                                                    sprintf (temp, "%s", $2.code) ;
-                                                                  }
-                                                                  $$.code = gen_code (temp) ; 
-                                                                }
-            |   dec_var_local vector_decl_local ';'             { if (strlen ($1.code) > 0) {
-                                                                    sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                                  } else {
-                                                                    sprintf (temp, "%s", $2.code) ;
-                                                                  }
-                                                                  $$.code = gen_code (temp) ;
-                                                                }
+dec_var_local:                                                      { $$.code = gen_code ("") ; } // lambda
+            |   dec_var_local integer_local ';'                     { if (strlen ($1.code) > 0) {
+                                                                        sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                      } else {
+                                                                        sprintf (temp, "%s", $2.code) ;
+                                                                      }
+                                                                      $$.code = gen_code (temp) ; 
+                                                                    }
+            |   dec_var_local vector_dec_local ';'                  { if (strlen ($1.code) > 0) {
+                                                                        sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                      } else {
+                                                                        sprintf (temp, "%s", $2.code) ;
+                                                                      }
+                                                                      $$.code = gen_code (temp) ;
+                                                                    }
             ;
 
-integer:        INTEGER lista_integer                       { $$ = $2 ; }
+integer:        INTEGER lista_integer                               { $$ = $2 ; }
             ;
 
 lista_integer:
-                IDENTIF r_integer                           { sprintf (temp, "(setq %s %s)", $1.code, $2.code);
-                                                              $$.code = gen_code(temp); }
-            |   IDENTIF r_integer ',' lista_integer         { sprintf (temp, "(setq %s %s) \n%s", $1.code, $2.code, $4.code);
-                                                              $$.code = gen_code(temp); }
+                IDENTIF r_integer                               { sprintf (temp, "(setq %s %s)", $1.code, $2.code);
+                                                                  $$.code = gen_code(temp); }
+            |   IDENTIF r_integer ',' lista_integer             { sprintf (temp, "(setq %s %s) \n%s", $1.code, $2.code, $4.code);
+                                                                  $$.code = gen_code(temp); }
             ;
           
-r_integer:                                                  { sprintf (temp, "0");
-                                                              $$.code = gen_code(temp);}  // lambda  
-            |   '=' NUMBER                                  { sprintf (temp, "%s", int_to_string($2.value));
-                                                              $$.code = gen_code(temp);}
+r_integer:                                                      { sprintf (temp, "0");
+                                                                  $$.code = gen_code(temp);}  // lambda  
+            |   '=' NUMBER                                      { sprintf (temp, "%s", int_to_string($2.value));
+                                                                  $$.code = gen_code(temp);}
             ;
 
 
@@ -174,52 +174,52 @@ lista_integer_local:
                                                                   $$.code = gen_code(temp); }
             ;
 
-vector_decl:     INTEGER IDENTIF '[' NUMBER ']'                { sprintf (temp, "(setq %s (make-array %d))", $2.code, $4.value) ;
+vector_dec:     INTEGER IDENTIF '[' NUMBER ']'                  { sprintf (temp, "(setq %s (make-array %d))", $2.code, $4.value) ;
                                                                   $$.code = gen_code (temp) ; }
             ;
 
-vector_decl_local:
-                INTEGER IDENTIF '[' NUMBER ']'                 { add_local($2.code) ;
+vector_dec_local:
+                INTEGER IDENTIF '[' NUMBER ']'                  { add_local($2.code) ;
                                                                   sprintf (temp, "(setq main_%s (make-array %d))", $2.code, $4.value) ;
                                                                   $$.code = gen_code (temp) ; }
             ;
 
-bq_sent:                                                    { $$.code = gen_code ("") ; } //lambda
-            |   bq_sent sentencia ';'                       { if (strlen ($1.code) > 0) {
-                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                              } else {
-                                                                sprintf (temp, "%s", $2.code) ;
-                                                              }
-                                                              $$.code = gen_code (temp) ;
-                                                            }
-            |   bq_sent st_while                            { if (strlen ($1.code) > 0) {
-                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                              } else {
-                                                                sprintf (temp, "%s", $2.code) ;
-                                                              }
-                                                              $$.code = gen_code (temp) ;
-                                                            }
-            |   bq_sent st_if                               { if (strlen ($1.code) > 0) {
-                                                              sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                              } else {
-                                                                sprintf (temp, "%s", $2.code) ;
-                                                              }
-                                                              $$.code = gen_code (temp) ; 
-                                                            }
-            |   bq_sent st_for                              { if (strlen ($1.code) > 0) {
-                                                                sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                              } else {
-                                                                sprintf (temp, "%s", $2.code) ;
-                                                              }
-                                                              $$.code = gen_code (temp) ; 
-                                                            }
-            |   bq_sent st_switch                           { if (strlen ($1.code) > 0) {
-                                                              sprintf (temp, "%s\n%s", $1.code, $2.code) ;
-                                                              } else {
-                                                              sprintf (temp, "%s", $2.code) ;
-                                                              }
-                                                              $$.code = gen_code (temp) ;
-                                                            }
+bq_sent:                                                        { $$.code = gen_code ("") ; } //lambda
+            |   bq_sent sentencia ';'                           { if (strlen ($1.code) > 0) {
+                                                                    sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                  } else {
+                                                                    sprintf (temp, "%s", $2.code) ;
+                                                                  }
+                                                                  $$.code = gen_code (temp) ;
+                                                                }
+            |   bq_sent st_while                                { if (strlen ($1.code) > 0) {
+                                                                    sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                  } else {
+                                                                    sprintf (temp, "%s", $2.code) ;
+                                                                  }
+                                                                  $$.code = gen_code (temp) ;
+                                                                }
+            |   bq_sent st_if                                   { if (strlen ($1.code) > 0) {
+                                                                  sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                  } else {
+                                                                    sprintf (temp, "%s", $2.code) ;
+                                                                  }
+                                                                  $$.code = gen_code (temp) ; 
+                                                                }
+            |   bq_sent st_for                                  { if (strlen ($1.code) > 0) {
+                                                                    sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                  } else {
+                                                                    sprintf (temp, "%s", $2.code) ;
+                                                                  }
+                                                                  $$.code = gen_code (temp) ; 
+                                                                }
+            |   bq_sent st_switch                               { if (strlen ($1.code) > 0) {
+                                                                  sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+                                                                  } else {
+                                                                  sprintf (temp, "%s", $2.code) ;
+                                                                  }
+                                                                  $$.code = gen_code (temp) ;
+                                                                }
             ;
 
 sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(setf %s %s)", get_var_name($1.code), $3.code) ; 
@@ -240,10 +240,10 @@ sentencia:      IDENTIF '=' expresion                       { sprintf (temp, "(s
                                                               $$.code = gen_code (temp) ; }
             ;
         
-op_inc_dec:     INC '(' IDENTIF ')'         { sprintf (temp, "(setf %s (+ %s 1))", get_var_name($3.code), get_var_name($3.code)) ;
-                                              $$.code = gen_code (temp) ; }
-            |   DEC '(' IDENTIF ')'         { sprintf (temp, "(setf %s (- %s 1))", get_var_name($3.code), get_var_name($3.code)) ;
-                                              $$.code = gen_code (temp) ; }
+op_inc_dec:     INC '(' IDENTIF ')'                         { sprintf (temp, "(setf %s (+ %s 1))", get_var_name($3.code), get_var_name($3.code)) ;
+                                                              $$.code = gen_code (temp) ; }
+            |   DEC '(' IDENTIF ')'                         { sprintf (temp, "(setf %s (- %s 1))", get_var_name($3.code), get_var_name($3.code)) ;
+                                                              $$.code = gen_code (temp) ; }
             ;
 
 st_while:       WHILE '(' expresion ')' '{' bq_sent '}'     { if (strlen ($6.code) > 0) {
@@ -320,13 +320,13 @@ lista_print:    elem_print                                  { sprintf (temp, "(p
                                                               $$.code = gen_code (temp) ; }
             ;
 
-lista_arg:                                              { $$.code = gen_code ("") ; } // lambda
-            |   arg_nonempty                            { $$ = $1 ; }
+lista_arg:                                                  { $$.code = gen_code ("") ; } // lambda
+            |   arg_nonempty                                { $$ = $1 ; }
             ;
 
-arg_nonempty:   expresion                               { $$ = $1 ; }
-            |   expresion ',' arg_nonempty              { sprintf (temp, "%s %s", $1.code, $3.code) ;
-                                                          $$.code = gen_code (temp) ; }
+arg_nonempty:   expresion                                   { $$ = $1 ; }
+            |   expresion ',' arg_nonempty                  { sprintf (temp, "%s %s", $1.code, $3.code) ;
+                                                              $$.code = gen_code (temp) ; }
             ;
 
 expresion:      termino                                     { $$ = $1 ; }
