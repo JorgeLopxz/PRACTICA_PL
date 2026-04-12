@@ -1,6 +1,0 @@
-
-"Dentro de funcion_prueba" 
-"Mitad del bucle" 
-"Dentro de otra_funcion" 
-"Iniciando main" 
-"El valor global inicial es correcto" 
