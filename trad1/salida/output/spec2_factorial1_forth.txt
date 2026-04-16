@@ -1,0 +1,3 @@
+ variable resultado  0  resultado ! 
+ variable n  0  n ! 
+ : main 
