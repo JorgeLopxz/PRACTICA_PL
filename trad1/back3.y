@@ -73,15 +73,21 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
                                                                                                       
             | '(' SETF /* */ ')'                { /* */ }    // Using a variable as receiver requires adding the store operator (!) in Forth 
 
-            | '(' PRINT STRING ')'              { /* */ }
+            | '(' PRINT STRING ')'              { printf (" .\" %s\" cr ", $3.code) ; }
 
-            | '(' PRINC /* */ ')'               { /* */ }    // Princ should be able to print both expreesions and strings
+            | '(' PRINC STRING ')'              { printf (" .\" %s\" ", $3.code) ; }    // Princ should be able to print strings
+            | '(' PRINC expression ')'          { printf (" . ") ; }    // Princ should print evaluated expressions
            
             | '(' PROGN exprSeq ')'             { /* */ }
 
             | '(' MAIN ')'                      { printf (" main\n") ; } // call to the main function 
 
+            | '(' IDENTIF ')'                   { printf (" %s \n", $2.code) ; } // call to a user-defined function without arguments
+
             | '(' DEFUN MAIN                    { printf (" : main ") ; } 
+                '(' ')' exprSeq ')'             { printf (" ;\n") ; }
+
+            | '(' DEFUN IDENTIF                 { printf (" : %s ", $3.code) ; }
                 '(' ')' exprSeq ')'             { printf (" ;\n") ; }
 
 // In real Lisp some expressions like if or Loop-While-Do are only permitted inside defun definitions (level 2 expressions) ==> Future ToDo
@@ -104,6 +110,10 @@ ifHead:       IF expression                     { printf (" IF ") ; }        // 
 
 
 expression:   operand                                   { ; }                // Common expressions combine arithmetic, relational and boolean expressions, including base operands.
+
+            | '(' '+' expression expression ')'         { printf (" + ") ; }
+
+            | '(' '*' expression expression ')'         { printf (" * ") ; }
 
             | '(' '-' expression expression ')'         { printf (" - ") ; }      // binary minus operator 
 
