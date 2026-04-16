@@ -69,7 +69,7 @@ r_exprSeq:    exprSeq                           { ; }
 expression1:  expression                        { ; }  // Lisp can evaluate arithmetical (and similar) expressions in REPL mode
                                                        // REPL Mode should print out the evaluated expressions ==> Future TODO for the Forth translation
 
-            | '(' SETQ IDENTIF number ')'       { /* */ }  // This is the declaration of a variable which in Forth has to be of global scope
+            | '(' SETQ IDENTIF { printf(" variable %s ", $3.code); } number ')' { printf(" %s ! \n", $3.code); }  // variable declaration
                                                                                                       
             | '(' SETF /* */ ')'                { /* */ }    // Using a variable as receiver requires adding the store operator (!) in Forth 
 
@@ -191,8 +191,8 @@ typedef struct s_keyword { // for the reserved words of C
     int token ;
 } t_keyword ;
 
-t_keyword keywords [] = {     // define the keywords 
-    "main",        MAIN,      // and their associated token  
+t_keyword keywords [] = {     // define the keywords
+    "main",        MAIN,      // and their associated token
     "defun",       DEFUN,
     "print",       PRINT,
     "princ",       PRINC,
@@ -202,6 +202,8 @@ t_keyword keywords [] = {     // define the keywords
     "and",         AND,
     "if",          IF,
     "progn",       PROGN,
+    "setq",        SETQ,
+    "setf",        SETF,
     NULL,          0          // 0 to mark the end of the table
 } ;
 
