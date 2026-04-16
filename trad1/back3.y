@@ -81,8 +81,8 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
 
             | '(' MAIN ')'                      { printf (" main\n") ; } // call to the main function 
 
-            | '(' DEFUN MAIN                    { /* */ } 
-                '(' ')' exprSeq ')'             {  /* */ }
+            | '(' DEFUN MAIN                    { printf (" : main ") ; } 
+                '(' ')' exprSeq ')'             { printf (" ;\n") ; }
 
 // In real Lisp some expressions like if or Loop-While-Do are only permitted inside defun definitions (level 2 expressions) ==> Future ToDo
 // Level 1 and common expressions (arithmetic etc.) are also permitted inside a defun definition
@@ -192,19 +192,19 @@ typedef struct s_keyword { // for the reserved words of C
 } t_keyword ;
 
 t_keyword keywords [] = {     // define the keywords
-    "main",        MAIN,      // and their associated token
-    "defun",       DEFUN,
-    "print",       PRINT,
-    "princ",       PRINC,
-    "loop",        LOOP,
-    "while",       WHILE,
-    "do",          DO,
-    "and",         AND,
-    "if",          IF,
-    "progn",       PROGN,
-    "setq",        SETQ,
-    "setf",        SETF,
-    NULL,          0          // 0 to mark the end of the table
+    {"main",      MAIN},      // and their associated token
+    {"defun",     DEFUN},
+    {"print",     PRINT},
+    {"princ",     PRINC},
+    {"loop",      LOOP},
+    {"while",     WHILE},
+    {"do",        DO},
+    {"and",       AND},
+    {"if",        IF},
+    {"progn",     PROGN},
+    {"setq",      SETQ},
+    {"setf",      SETF},
+    {NULL,          0}          // 0 to mark the end of the table
 } ;
 
 t_keyword *search_keyword (char *symbol_name)

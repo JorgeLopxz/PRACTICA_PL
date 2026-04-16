@@ -1221,13 +1221,13 @@ yyreduce:
 
   case 15: /* $@3: %empty  */
 #line 84 "back3.y"
-                                                { /* */ }
+                                                { printf (" : main ") ; }
 #line 1226 "back3.tab.c"
     break;
 
   case 16: /* expression1: '(' DEFUN MAIN $@3 '(' ')' exprSeq ')'  */
 #line 85 "back3.y"
-                                                {  /* */ }
+                                                { printf (" ;\n") ; }
 #line 1232 "back3.tab.c"
     break;
 
@@ -1574,19 +1574,19 @@ typedef struct s_keyword { // for the reserved words of C
 } t_keyword ;
 
 t_keyword keywords [] = {     // define the keywords
-    "main",        MAIN,      // and their associated token
-    "defun",       DEFUN,
-    "print",       PRINT,
-    "princ",       PRINC,
-    "loop",        LOOP,
-    "while",       WHILE,
-    "do",          DO,
-    "and",         AND,
-    "if",          IF,
-    "progn",       PROGN,
-    "setq",        SETQ,
-    "setf",        SETF,
-    NULL,          0          // 0 to mark the end of the table
+    {"main",      MAIN},      // and their associated token
+    {"defun",     DEFUN},
+    {"print",     PRINT},
+    {"princ",     PRINC},
+    {"loop",      LOOP},
+    {"while",     WHILE},
+    {"do",        DO},
+    {"and",       AND},
+    {"if",        IF},
+    {"progn",     PROGN},
+    {"setq",      SETQ},
+    {"setf",      SETF},
+    {NULL,          0}          // 0 to mark the end of the table
 } ;
 
 t_keyword *search_keyword (char *symbol_name)
