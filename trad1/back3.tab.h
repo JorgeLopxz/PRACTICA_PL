@@ -68,7 +68,13 @@ extern int yydebug;
     PRINC = 269,                   /* PRINC  */
     AND = 270,                     /* AND  */
     IF = 271,                      /* IF  */
-    PROGN = 272                    /* PROGN  */
+    PROGN = 272,                   /* PROGN  */
+    MOD = 273,                     /* MOD  */
+    OR = 274,                      /* OR  */
+    NOT = 275,                     /* NOT  */
+    NE = 276,                      /* NE  */
+    GE = 277,                      /* GE  */
+    LE = 278                       /* LE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

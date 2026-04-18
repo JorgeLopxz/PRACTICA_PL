@@ -46,6 +46,12 @@ typedef struct s_attr {
 %token AND
 %token IF 
 %token PROGN
+%token MOD
+%token OR
+%token NOT
+%token NE
+%token GE
+%token LE
 
 
 // %prec section not needed in LISP
@@ -117,7 +123,27 @@ expression:   operand                                   { ; }                // 
 
             | '(' '-' expression expression ')'         { printf (" - ") ; }      // binary minus operator 
 
-/* - * / MOD AND OR > < GE LE ... NOT */
+            | '(' '/' expression expression ')'         { printf (" / ") ; }
+
+            | '(' MOD expression expression ')'         { printf (" mod ") ; }
+
+            | '(' AND expression expression ')'         { printf (" and ") ; }
+
+            | '(' OR expression expression ')'          { printf (" or ") ; }
+
+            | '(' '=' expression expression ')'         { printf (" = ") ; }
+
+            | '(' NE expression expression ')'          { printf (" = 0= ") ; }
+
+            | '(' '>' expression expression ')'         { printf (" > ") ; }
+
+            | '(' '<' expression expression ')'         { printf (" < ") ; }
+
+            | '(' GE expression expression ')'          { printf (" >= ") ; }
+
+            | '(' LE expression expression ')'          { printf (" <= ") ; }
+
+            | '(' NOT expression ')'                    { printf (" 0= ") ; }
 
             | '(' '-' expression ')'                    { printf (" negate ") ; } // Unary minus operator in Lisp
             ;
@@ -214,6 +240,12 @@ t_keyword keywords [] = {     // define the keywords
     {"progn",     PROGN},
     {"setq",      SETQ},
     {"setf",      SETF},
+    {"mod",       MOD},
+    {"or",        OR},
+    {"not",       NOT},
+    {"/=",        NE},
+    {">=",        GE},          
+    {"<=",        LE},          
     {NULL,          0}          // 0 to mark the end of the table
 } ;
 
