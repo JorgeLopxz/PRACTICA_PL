@@ -1383,8 +1383,8 @@ yyreduce:
 
   case 5: /* def_main: MAIN '(' ')' $@1 '{' dec_var_local bq_sent '}'  */
 #line 94 "trad3.y"
-                                                                  { sprintf (temp, "(defun main ()\n%s\n%s)", yyvsp[-2].code, yyvsp[-1].code) ;
-                                                                    yyval.code = gen_code (temp) ; }
+                                                                { sprintf (temp, "(defun main ()\n%s\n%s)", yyvsp[-2].code, yyvsp[-1].code) ;
+                                                                  yyval.code = gen_code (temp) ; }
 #line 1389 "trad3.tab.c"
     break;
 
@@ -1705,14 +1705,14 @@ yyreduce:
   case 44: /* st_for: FOR '(' sentencia ';' expresion ';' op_inc_dec ')' '{' bq_sent '}'  */
 #line 259 "trad3.y"
                                 { 
-                                  if (strlen (yyvsp[-1].code) > 0) {
-                                    // Si hay código en el bloque, el incremento va al final del bloque
-                                    sprintf (temp, "%s\n(loop while %s do\n%s\n%s)", yyvsp[-8].code, yyvsp[-6].code, yyvsp[-1].code, yyvsp[-4].code) ;
-                                  } else {
-                                    // Si el bloque está vacío, solo se ejecuta el incremento dentro del bucle
-                                    sprintf (temp, "%s\n(loop while %s do\n%s)", yyvsp[-8].code, yyvsp[-6].code, yyvsp[-4].code) ;
-                                  }
-                                  yyval.code = gen_code (temp) ; 
+                                    if (strlen (yyvsp[-1].code) > 0) {
+                                        // Si hay código en el bloque, el incremento va al final del bloque
+                                        sprintf (temp, "%s\n(loop while %s do\n%s\n%s)", yyvsp[-8].code, yyvsp[-6].code, yyvsp[-1].code, yyvsp[-4].code) ;
+                                    } else {
+                                        // Si el bloque está vacío, solo se ejecuta el incremento dentro del bucle
+                                        sprintf (temp, "%s\n(loop while %s do\n%s)", yyvsp[-8].code, yyvsp[-6].code, yyvsp[-4].code) ;
+                                    }
+                                    yyval.code = gen_code (temp) ; 
                                 }
 #line 1718 "trad3.tab.c"
     break;

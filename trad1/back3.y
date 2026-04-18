@@ -71,7 +71,7 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
 
             | '(' SETQ IDENTIF { printf(" variable %s ", $3.code); } number ')' { printf(" %s ! \n", $3.code); }  // variable declaration
                                                                                                       
-            | '(' SETF /* */ ')'                { /* */ }    // Using a variable as receiver requires adding the store operator (!) in Forth 
+            | '(' SETF IDENTIF expression ')'   { printf (" %s ! \n", $3.code) ; }    // Using a variable as receiver requires adding the store operator (!) in Forth 
 
             | '(' PRINT STRING ')'              { printf (" .\" %s\" cr ", $3.code) ; }
 
@@ -93,9 +93,9 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
 // In real Lisp some expressions like if or Loop-While-Do are only permitted inside defun definitions (level 2 expressions) ==> Future ToDo
 // Level 1 and common expressions (arithmetic etc.) are also permitted inside a defun definition
 
-            | '(' LOOP WHILE                    { /* */  }  
-                 expression                     {  /* */ } 
-                 DO exprSeq ')'                 {  /* */ }
+            | '(' LOOP WHILE                    { printf (" BEGIN\n") ;  }  
+                 expression                     {  printf (" WHILE\n") ; } 
+                 DO exprSeq ')'                 {  printf (" REPEAT\n") ; }
 
             | '(' ifHead  expression1 ')'       { printf (" THEN\n") ; }     // If Expression then Expression1
                                                                              // ifHead is used to avoid conflicts through partial factorization
