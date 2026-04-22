@@ -1,3 +1,6 @@
+//  509 , Raoul Vlad Ivaszuk Ivaszuk , Jorge Lopez Alonso
+//  100508621@alumnos.uc3m.es , 100495876@alumnos.uc3m.es
+
 %{                          // SECTION 1 Declarations for C-Bison
 #include <stdio.h>
 #include <ctype.h>            // tolower()
@@ -82,6 +85,7 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
             | '(' PRINT STRING ')'              { printf (" .\" %s\" cr ", $3.code) ; }
 
             | '(' PRINC STRING ')'              { printf (" .\" %s\" ", $3.code) ; }    // Princ should be able to print strings
+            
             | '(' PRINC expression ')'          { printf (" . ") ; }    // Princ should print evaluated expressions
            
             | '(' PROGN exprSeq ')'             { /* */ }
