@@ -112,17 +112,17 @@ param_def_nonempty:     INTEGER IDENTIF                             { $$.code = 
             ;
 
 dec_var:                                                            { $$.code = gen_code ("") ; } // lambda
-            |   dec_var integer ';'                                 { if (strlen ($1.code) > 0) {
-                                                                        sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+            |   integer ';' dec_var                                 { if (strlen ($3.code) > 0) {
+                                                                        sprintf (temp, "%s\n%s", $1.code, $3.code) ;
                                                                       } else {
-                                                                        sprintf (temp, "%s", $2.code) ;
+                                                                        sprintf (temp, "%s", $1.code) ;
                                                                       }
                                                                       $$.code = gen_code (temp) ;
                                                                     }
-            |   dec_var vector_dec ';'                              { if (strlen ($1.code) > 0) {
-                                                                        sprintf (temp, "%s\n%s", $1.code, $2.code) ;
+            |   vector_dec ';' dec_var                              { if (strlen ($3.code) > 0) {
+                                                                        sprintf (temp, "%s\n%s", $1.code, $3.code) ;
                                                                       } else {
-                                                                        sprintf (temp, "%s", $2.code) ;
+                                                                        sprintf (temp, "%s", $1.code) ;
                                                                       }
                                                                       $$.code = gen_code (temp) ;
                                                                     }
