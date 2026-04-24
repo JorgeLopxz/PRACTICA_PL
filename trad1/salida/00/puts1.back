@@ -1,0 +1,2 @@
+ : main  ."  El texto se imprime " cr  ;
+ main

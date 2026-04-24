@@ -1,13 +1,9 @@
-// =======================================================================
 // ESPECIFICACIÓN 1: Variables Globales (simples y múltiples con/sin init)
 // ESPECIFICACIÓN 12: Vectores (Declaración global)
-// =======================================================================
 int global_a = 10, global_b = 0, global_c;
 int vector_global[5];
 
-// =======================================================================
 // ESPECIFICACIÓN 11: Funciones (Parámetros, retornos múltiples, return)
-// =======================================================================
 es_par_o_impar(int v)
 {
     // ESPECIFICACIÓN 8: Variables Locales
@@ -43,9 +39,7 @@ procesar_vector(int multiplicador)
     return 1;
 }
 
-// =======================================================================
 // ESPECIFICACIÓN 2: Función MAIN
-// =======================================================================
 main()
 {
     // ESPECIFICACIÓN 8: Variables Locales Múltiples
@@ -63,7 +57,7 @@ main()
         i = i + 1;
     }
 
-    // ESPECIFICACIÓN 4: Impresión de expresiones y cadenas (printf con multiples param)
+    // ESPECIFICACIÓN 4: Impresión de expresiones y cadenas
     printf("El valor de vector_global en pos 3 es: %d", vector_global[3]);
     puts(""); // Salto de línea
 
@@ -87,7 +81,7 @@ main()
         break;
     }
 
-    // ESPECIFICACIÓN 5: Precedencia y Operadores Lógicos/Cortocircuito (&&, !=, >)
+    // ESPECIFICACIÓN 5: Precedencia y Operadores Lógicos
     if (global_a > 5 && global_b != 10)
     {
         puts("Condicion relacional compleja evaluada como verdadera");
@@ -103,5 +97,4 @@ main()
     return 0; // Return del main
 }
 
-// Directiva para arrancar Lisp
 //@ (main)
