@@ -1,2 +1,0 @@
- : main  ." hola" cr  ;
- main
